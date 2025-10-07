@@ -1,3 +1,7 @@
+USE PersistenceTest
+
+GO
+
 -- ===============================
 -- Sales Management Schema (MSSQL)
 -- ===============================
@@ -9,6 +13,10 @@ IF OBJECT_ID('dbo.OrderLineItem', 'U') IS NOT NULL DROP TABLE dbo.OrderLineItem;
 IF OBJECT_ID('dbo.SalePrice', 'U') IS NOT NULL DROP TABLE dbo.SalePrice;
 IF OBJECT_ID('dbo.Stock', 'U') IS NOT NULL DROP TABLE dbo.Stock;
 IF OBJECT_ID('dbo.SaleOrder', 'U') IS NOT NULL DROP TABLE dbo.SaleOrder;
+IF OBJECT_ID('dbo.GunReplica', 'U') IS NOT NULL DROP TABLE dbo.GunReplica;
+IF OBJECT_ID('dbo.Equipment', 'U') IS NOT NULL DROP TABLE dbo.Equipment;
+IF OBJECT_ID('dbo.Clothing', 'U') IS NOT NULL DROP TABLE dbo.Clothing;
+IF OBJECT_ID('dbo.Music', 'U') IS NOT NULL DROP TABLE dbo.Music;
 IF OBJECT_ID('dbo.Product', 'U') IS NOT NULL DROP TABLE dbo.Product;
 IF OBJECT_ID('dbo.Warehouse', 'U') IS NOT NULL DROP TABLE dbo.Warehouse;
 IF OBJECT_ID('dbo.Supplier', 'U') IS NOT NULL DROP TABLE dbo.Supplier;
@@ -42,15 +50,35 @@ CREATE TABLE dbo.Product (
     name          NVARCHAR(100) NOT NULL,
     minStock      INT NULL,
     supplierPhoneNo_FK NVARCHAR(20) NULL,
-    format        NVARCHAR(50)  NULL,
-    artist        NVARCHAR(100) NULL,
-    size          NVARCHAR(50)  NULL,
-    colour        NVARCHAR(50)  NULL,
-    eqpmtMaterial NVARCHAR(100) NULL,
-    style         NVARCHAR(50)  NULL,
-    calibre       NVARCHAR(50)  NULL,
-    gnMaterial    NVARCHAR(100) NULL,
     CONSTRAINT FK_Product_Supplier FOREIGN KEY (supplierPhoneNo_FK) REFERENCES dbo.Supplier(phoneNo)
+);
+
+CREATE TABLE dbo.Music (
+    productNumber_FK INT PRIMARY KEY,
+    format           NVARCHAR(100) NOT NULL,
+    artist           NVARCHAR(100) NOT NULL,
+    CONSTRAINT FK_MUSIC_PRODUCT FOREIGN KEY (productNumber_FK) REFERENCES dbo.Product(productNumber)
+);
+
+CREATE TABLE dbo.Clothing (
+    productNumber_FK INT PRIMARY KEY,
+    size             NVARCHAR(100) NOT NULL,
+    color            NVARCHAR(100) NOT NULL,
+    CONSTRAINT FK_CLOTHING_PRODUCT FOREIGN KEY (productNumber_FK) REFERENCES dbo.Product(productNumber)
+);
+
+CREATE TABLE dbo.Equipment (
+    productNumber_FK INT PRIMARY KEY,
+    material         NVARCHAR(100) NOT NULL,
+    style            NVARCHAR(100) NOT NULL,
+    CONSTRAINT FK_EQUIPMENT_PRODUCT FOREIGN KEY (productNumber_FK) REFERENCES dbo.Product(productNumber)
+);
+
+CREATE TABLE dbo.GunReplica (
+    productNumber_FK INT PRIMARY KEY,
+    calibre          NVARCHAR(100) NOT NULL,
+    material         NVARCHAR(100) NOT NULL,
+    CONSTRAINT FK_GUNREPLICA_PRODUCT FOREIGN KEY (productNumber_FK) REFERENCES dbo.Product(productNumber)
 );
 
 -- (composite PK ensures multiple products can have prices at the same timestamp)

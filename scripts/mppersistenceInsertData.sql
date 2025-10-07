@@ -18,46 +18,37 @@ VALUES
 -- ==================================
 INSERT INTO dbo.Warehouse ([number], name, description)
 VALUES
-(1, 'Main Warehouse', 'Primary distribution center');	
+(1, 'Main Warehouse', 'Primary distribution center');
 
 -- ==================================
--- Insert Products
+-- Insert Products (base)
 -- ==================================
--- Example 1: a music album (art-related product)
-INSERT INTO dbo.Product (
-    productNumber, name, minStock, supplierPhoneNo_FK,
-    format, artist, size, colour, eqpmtMaterial, style, calibre, gnMaterial
-)
+INSERT INTO dbo.Product (productNumber, name, minStock, supplierPhoneNo_FK)
 VALUES
-(1001, '2Pac - Me Against The World', 10, '33333333',
- 'Vinyl', '2Pac', '12-inch', NULL, NULL, 'Hip-Hop', NULL, NULL);
+(1001, '2Pac - Me Against The World', 10, '33333333'),
+(1002, 'Camping Tent 3-Person', 5, '33333333'),
+(1003, 'Leather Jacket', 15, '33333333'),
+(1004, 'WWII Pistol Replica', 3, '33333333');
 
--- Example 2: an equipment item (material-related product)
-INSERT INTO dbo.Product (
-    productNumber, name, minStock, supplierPhoneNo_FK,
-    format, artist, size, colour, eqpmtMaterial, style, calibre, gnMaterial
-)
-VALUES
-(1002, 'Camping Tent 3-Person', 5, '33333333',
- NULL, NULL, '3-person', 'Green', 'Polyester', NULL, NULL, NULL);
+-- ==================================
+-- Insert Subclass Data
+-- ==================================
 
--- Example 3: a clothing item 
-INSERT INTO dbo.Product (
-    productNumber, name, minStock, supplierPhoneNo_FK,
-    format, artist, size, colour, eqpmtMaterial, style, calibre, gnMaterial
-)
-VALUES
-(1003, 'Leather Jacket', 15, '33333333',
- NULL, NULL, 'L', 'Black', 'Leather', 'Casual', NULL, NULL);
+-- Music
+INSERT INTO dbo.Music (productNumber_FK, format, artist)
+VALUES (1001, 'Vinyl', '2Pac');
 
--- Example 4: a GunReplica item
-INSERT INTO dbo.Product (
-    productNumber, name, minStock, supplierPhoneNo_FK,
-    format, artist, size, colour, eqpmtMaterial, style, calibre, gnMaterial
-)
-VALUES
-(1004, 'WWII Pistol Replica', 3, '33333333',
- NULL, NULL, 'Standard', 'Metallic', 'Metal', 'Replica', '9mm', NULL);
+-- Equipment
+INSERT INTO dbo.Equipment (productNumber_FK, material, style)
+VALUES (1002, 'Polyester', 'Outdoor');
+
+-- Clothing
+INSERT INTO dbo.Clothing (productNumber_FK, size, color)
+VALUES (1003, 'L', 'Black');
+
+-- GunReplica
+INSERT INTO dbo.GunReplica (productNumber_FK, calibre, material)
+VALUES (1004, '9mm', 'Metal');
 
 -- ==================================
 -- Insert Stock
