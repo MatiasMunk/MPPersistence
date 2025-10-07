@@ -1,7 +1,3 @@
-USE PersistenceTest
-
-GO
-
 -- ===============================
 -- Sales Management Schema (MSSQL)
 -- ===============================
@@ -20,23 +16,36 @@ IF OBJECT_ID('dbo.Music', 'U') IS NOT NULL DROP TABLE dbo.Music;
 IF OBJECT_ID('dbo.Product', 'U') IS NOT NULL DROP TABLE dbo.Product;
 IF OBJECT_ID('dbo.Warehouse', 'U') IS NOT NULL DROP TABLE dbo.Warehouse;
 IF OBJECT_ID('dbo.Supplier', 'U') IS NOT NULL DROP TABLE dbo.Supplier;
+IF OBJECT_ID('dbo.SupplierDetails', 'U') IS NOT NULL DROP TABLE dbo.SupplierDetails;
 IF OBJECT_ID('dbo.Customer', 'U') IS NOT NULL DROP TABLE dbo.Customer;
+IF OBJECT_ID('dbo.CustomerDetails', 'U') IS NOT NULL DROP TABLE dbo.CustomerDetails;
+
+CREATE TABLE dbo.CustomerDetails (
+    zipcode    NVARCHAR(20) PRIMARY KEY,
+    city       NVARCHAR(100) NULL,
+);
 
 CREATE TABLE dbo.Customer (
     phoneNo    NVARCHAR(20) PRIMARY KEY,
     name       NVARCHAR(100) NOT NULL,
     address    NVARCHAR(200) NULL,
-    zipcode    NVARCHAR(20)  NULL,
-    city       NVARCHAR(100) NULL,
-    type       NVARCHAR(50)  NULL
+    zipCity_FK    NVARCHAR(20)  NULL,
+    type       NVARCHAR(50)  NULL,
+	CONSTRAINT FK_Customer_zipCity FOREIGN KEY (zipCity_FK) REFERENCES dbo.CustomerDetails(zipcode)
+);
+
+CREATE TABLE dbo.SupplierDetails (
+    country NVARCHAR(100) PRIMARY KEY,
+	address NVARCHAR(200) NULL
 );
 
 CREATE TABLE dbo.Supplier (
     phoneNo NVARCHAR(20) PRIMARY KEY,
     name    NVARCHAR(100) NOT NULL,
     address NVARCHAR(200) NULL,
-    country NVARCHAR(100) NULL,
-    email   NVARCHAR(100) NULL
+    country_FK NVARCHAR(100) NULL,
+    email   NVARCHAR(100) NULL,
+	CONSTRAINT FK_Supplier_Country FOREIGN KEY (country_FK) REFERENCES dbo.SupplierDetails(country)
 );
 
 CREATE TABLE dbo.Warehouse (
