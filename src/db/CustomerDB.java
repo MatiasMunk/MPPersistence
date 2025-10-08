@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import model.Customer;
 
-public class CustomerDB {
+public class CustomerDB implements CustomerDBIF {
     
     public Customer findCustomerByPhone(int phone) throws DataAccessException {
         Customer customer = null;

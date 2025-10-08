@@ -1,5 +1,5 @@
 package db;
 
-public class DiscountDB {
+public class DiscountDB implements DiscountDBIF {
 
 }

@@ -12,7 +12,7 @@ import db.DBMessages;
 import model.Customer;
 import model.Product;
 
-public class ProductDB {
+public class ProductDB implements ProductDBIF {
     
 
     public Product findProductByNumber(int productNumber) throws DataAccessException {

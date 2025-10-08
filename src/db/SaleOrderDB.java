@@ -1,5 +1,5 @@
 package db;
 
-public class SaleOrderDB {
+public class SaleOrderDB implements SaleOrderDBIF {
 
 }

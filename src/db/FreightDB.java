@@ -1,5 +1,5 @@
 package db;
 
-public class FreightDB {
+public class FreightDB implements FreightDBIF {
 
 }
