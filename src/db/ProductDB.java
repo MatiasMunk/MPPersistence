@@ -1,5 +1,6 @@
 package db;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,6 +31,54 @@ public class ProductDB implements ProductDBIF {
 		}
 		return product;
     }
+    
+    public void reserveProduct(int productNumber, int quantity) throws DataAccessException {
+        String checkStockSQL = "SELECT availableQty, reservedQty FROM Stock WHERE productNumber_FK = ?;";
+        String updateStockSQL = "UPDATE Stock SET availableQty = availableQty - ?, reservedQty = reservedQty + ? WHERE productNumber_FK = ?;";
+        
+        Connection conn = DBConnection.getInstance().getConnection();
+        try (
+            PreparedStatement checkStmt = conn.prepareStatement(checkStockSQL);
+            PreparedStatement updateStmt = conn.prepareStatement(updateStockSQL)
+        ) {
+            conn.setAutoCommit(false);
+
+            checkStmt.setInt(1, productNumber);
+            ResultSet rs = checkStmt.executeQuery();
+
+            if (!rs.next()) {
+                conn.rollback();
+                throw new SQLException();
+            }
+
+            int available = rs.getInt("availableQty");
+            if (available < quantity) {
+                conn.rollback();
+                throw new SQLException();
+            }
+
+            updateStmt.setInt(1, quantity);
+            updateStmt.setInt(2, quantity);
+            updateStmt.setInt(3, productNumber);
+            int affected = updateStmt.executeUpdate();
+
+            if (affected == 0) {
+                conn.rollback();
+                throw new SQLException();
+            }
+
+            conn.commit();
+            System.out.println(quantity + " units of product " + productNumber + " reserved.");
+        }
+        catch (SQLException e) {
+            try { conn.rollback(); } catch (SQLException ignore) {}
+            throw new DataAccessException(0x1040, e);
+        }
+        finally {
+            try { conn.setAutoCommit(true); } catch (SQLException ignore) {}
+        }
+    }
+
     
     private Product buildObject(ResultSet rs) throws DataAccessException {
     	Product product;

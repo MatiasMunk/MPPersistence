@@ -37,7 +37,7 @@ public class SaleOrderController {
         saleOrderDB = new SaleOrderDB();
         productsInOrder = new ArrayList<>();
     }
-
+    
     // 1.1 create SaleOrder
     public SaleOrder placeOrder() throws DataAccessException {
         currentOrder = new SaleOrder(new Date(), 0.0, "Pending", new Date());
@@ -52,6 +52,7 @@ public class SaleOrderController {
                 throw new SQLException();
             }
 
+            productDB.reserveProduct(productNumber, quantity);
             for (int i = 0; i < quantity; i++) {
                 productsInOrder.add(p);
             }
@@ -63,7 +64,6 @@ public class SaleOrderController {
             throw new DataAccessException(0x10F2, e);
         }
     }
-
 
     // 3.1 addCustomer(phoneNumber)
     public void addCustomer(int phoneNumber) throws DataAccessException {

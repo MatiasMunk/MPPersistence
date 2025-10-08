@@ -48,6 +48,7 @@ public class Scenario {
 	        // Step 4: Confirmation
 	        saleOrderController.confirmation(); // 5.1
 	        System.out.println("Order successfully placed!");
+	        saleOrderController.endTransaction();
 
 	    } catch (DataAccessException e) {
 	        System.out.println("Database error: " + e.getMessage());
@@ -60,7 +61,6 @@ public class Scenario {
 	private int showMenu() {
 		System.out.println("\nSALES HANDLING");
 		System.out.println(" 1) Place order");
-		System.out.println(" 2) Add Product to order");
 		System.out.println(" 0) Quit program!");
 		return kr.readInt("Make a choice: ", "You must type in an integer: ");
 	}
