@@ -57,8 +57,18 @@ public class Scenario {
 
 	    } catch (DataAccessException e) {
 	        System.out.println("Database error: " + e.getMessage());
+	        try {
+	            saleOrderController.rollbackTransaction();
+	        } catch (DataAccessException rollbackEx) {
+	            System.out.println("Rollback failed: " + rollbackEx.getMessage());
+	        }
 	    } catch (Exception e) {
 	        System.out.println("Error placing order: " + e.getMessage());
+	        try {
+	            saleOrderController.rollbackTransaction();
+	        } catch (DataAccessException rollbackEx) {
+	            System.out.println("Rollback failed: " + rollbackEx.getMessage());
+	        }
 	    }
 	}
 

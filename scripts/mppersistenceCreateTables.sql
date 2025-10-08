@@ -14,7 +14,6 @@ IF OBJECT_ID('dbo.Equipment', 'U') IS NOT NULL DROP TABLE dbo.Equipment;
 IF OBJECT_ID('dbo.Clothing', 'U') IS NOT NULL DROP TABLE dbo.Clothing;
 IF OBJECT_ID('dbo.Music', 'U') IS NOT NULL DROP TABLE dbo.Music;
 IF OBJECT_ID('dbo.Product', 'U') IS NOT NULL DROP TABLE dbo.Product;
-IF OBJECT_ID('dbo.Warehouse', 'U') IS NOT NULL DROP TABLE dbo.Warehouse;
 IF OBJECT_ID('dbo.Supplier', 'U') IS NOT NULL DROP TABLE dbo.Supplier;
 IF OBJECT_ID('dbo.SupplierDetails', 'U') IS NOT NULL DROP TABLE dbo.SupplierDetails;
 IF OBJECT_ID('dbo.Customer', 'U') IS NOT NULL DROP TABLE dbo.Customer;
@@ -46,12 +45,6 @@ CREATE TABLE dbo.Supplier (
     country_FK NVARCHAR(100) NULL,
     email   NVARCHAR(100) NULL,
 	CONSTRAINT FK_Supplier_Country FOREIGN KEY (country_FK) REFERENCES dbo.SupplierDetails(country)
-);
-
-CREATE TABLE dbo.Warehouse (
-    [number] INT PRIMARY KEY,
-    name     NVARCHAR(100) NOT NULL,
-    description NVARCHAR(255) NULL
 );
 
 CREATE TABLE dbo.Product (
@@ -101,12 +94,10 @@ CREATE TABLE dbo.SalePrice (
 
 CREATE TABLE dbo.Stock (
     productNumber_FK   INT NOT NULL,
-    warehouseNumber_FK INT NOT NULL,
     availableQty       INT NOT NULL DEFAULT(0),
     reservedQty        INT NOT NULL DEFAULT(0),
-    CONSTRAINT PK_Stock PRIMARY KEY (productNumber_FK, warehouseNumber_FK),
-    CONSTRAINT FK_Stock_Product FOREIGN KEY (productNumber_FK) REFERENCES dbo.Product(productNumber),
-    CONSTRAINT FK_Stock_Warehouse FOREIGN KEY (warehouseNumber_FK) REFERENCES dbo.Warehouse([number])
+    CONSTRAINT PK_Stock PRIMARY KEY (productNumber_FK),
+    CONSTRAINT FK_Stock_Product FOREIGN KEY (productNumber_FK) REFERENCES dbo.Product(productNumber)
 );
 
 CREATE TABLE dbo.SaleOrder (
