@@ -17,7 +17,7 @@ public class ProductDB implements ProductDBIF {
 
     public Product findProductByNumber(int productNumber) throws DataAccessException {
     	Product product = null;
-		String template = "SELECT * FROM Products WHERE productNumber = ?;";
+		String template = "SELECT * FROM Product WHERE productNumber = ?;";
 		try (PreparedStatement sql = DBConnection.getInstance().getConnection().prepareStatement(template)) {
 			sql.setInt(1, productNumber);
 			ResultSet rs = sql.executeQuery();

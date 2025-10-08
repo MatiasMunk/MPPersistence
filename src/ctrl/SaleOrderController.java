@@ -49,7 +49,7 @@ public class SaleOrderController {
         try {
             Product p = productDB.findProductByNumber(productNumber);
             if (p == null) {
-                throw new SQLException("Product not found: " + productNumber);
+                throw new SQLException();
             }
 
             for (int i = 0; i < quantity; i++) {
@@ -61,9 +61,6 @@ public class SaleOrderController {
         } catch (SQLException e) {
             // Wrap in DataAccessException with product-specific error code
             throw new DataAccessException(0x10F2, e);
-        } catch (Exception e) {
-            // Catch-all for unexpected runtime issues
-            throw new DataAccessException(0x10F3, e);
         }
     }
 

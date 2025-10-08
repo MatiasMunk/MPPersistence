@@ -19,7 +19,7 @@ public class DBMessages {
 		lookup.put(0x1031, "Database error: Cannot update group");
 		lookup.put(0x1041, "Database error: Cannot delete group");
 		lookup.put(0x10F1, "Database error: Cannot build group");
-		lookup.put(0x10F2, "Database error: Cannot build groups");
+		lookup.put(0x10F2, "Database error: Cannot find product");
 
 		lookup.put(0x2011, "Database error: Cannot create student");
 		lookup.put(0x2021, "Database error: Cannot find specific student");
