@@ -1,31 +1,66 @@
 package tui;
 
+import java.util.List;
+
 import db.DataAccessException;
 import db.DBConnection;
 import dk.raptus.KeyboardReader; // Provided by KeyboardReader.jar (in /lib)
-import java.util.List;
+
+import ctrl.SaleOrderController;
+
+import model.SaleOrder;
 
 public class Scenario {
 	private KeyboardReader kr;
+	private SaleOrderController saleOrderController;
 
 	public Scenario() {
 		kr = KeyboardReader.getInstance();
+		saleOrderController = new SaleOrderController();
 	}
 	
-	private void placeOrder()
-	{
-		
+	private void placeOrder() {
+	    try {
+	        System.out.println("\n=== PLACE NEW ORDER ===");
+	        
+	        // Step 1: Create the order
+	        System.out.println("Creating sale order...");
+	        SaleOrder order = saleOrderController.placeOrder(); // 1.1 in diagram
+	        
+	        boolean addingProducts = true;
+	        while (addingProducts) {
+	            int productNumber = kr.readInt("Enter product number: ", "You must type in an integer: ");
+	            int quantity = kr.readInt("Enter quantity: ", "You must type in an integer: ");
+	            saleOrderController.addProduct(productNumber, quantity); // 2.1
+	            
+	            String more = kr.readString("Add more products? (y/n): ");
+	            addingProducts = more.equalsIgnoreCase("y");
+	        }
+
+	        // Step 2: Add customer
+	        int phoneNumber = kr.readInt("Enter customer phone number: ", "You must type in an integer: ");
+	        saleOrderController.addCustomer(phoneNumber); // 3.1
+
+	        // Step 3: Freight
+	        String method = kr.readString("Enter freight method (standard/express): ");
+	        saleOrderController.createFreight(method); // 4.1
+
+	        // Step 4: Confirmation
+	        saleOrderController.confirmation(); // 5.1
+	        System.out.println("Order successfully placed!");
+
+	    } catch (DataAccessException e) {
+	        System.out.println("Database error: " + e.getMessage());
+	    } catch (Exception e) {
+	        System.out.println("Error placing order: " + e.getMessage());
+	    }
 	}
 
-	private void showSales()
-	{
-		
-	}
 	
 	private int showMenu() {
 		System.out.println("\nSALES HANDLING");
 		System.out.println(" 1) Place order");
-		System.out.println(" 2) Show sales");
+		System.out.println(" 2) Add Product to order");
 		System.out.println(" 0) Quit program!");
 		return kr.readInt("Make a choice: ", "You must type in an integer: ");
 	}
@@ -41,7 +76,6 @@ public class Scenario {
 					placeOrder();
 					break;
 				case 2:
-					showSales();
 					break;
 				default:
 					System.out.println("Wrong choice - let's try again!");
