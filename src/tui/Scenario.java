@@ -48,7 +48,6 @@ public class Scenario {
 	        // Step 4: Confirmation
 	        saleOrderController.confirmation(); // 5.1
 	        System.out.println("Order successfully placed!");
-	        saleOrderController.endTransaction();
 
 	    } catch (DataAccessException e) {
 	        System.out.println("Database error: " + e.getMessage());
