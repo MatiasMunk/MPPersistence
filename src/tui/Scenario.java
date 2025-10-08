@@ -42,8 +42,8 @@ public class Scenario {
 	        saleOrderController.addCustomer(phoneNumber); // 3.1
 
 	        // Step 3: Freight
-	        String method = kr.readString("Enter freight method (standard/express): ");
-	        saleOrderController.createFreight(method); // 4.1
+	        int method = kr.readInt("Enter freight method (0 = no freight/1 = freight): ", "You must type in an integer: ");
+	        saleOrderController.freightDecision(method == 0 ? false : true); // 4.1
 
 	        // Step 4: Confirmation
 	        saleOrderController.confirmation(); // 5.1

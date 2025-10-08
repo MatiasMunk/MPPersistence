@@ -73,7 +73,7 @@ public class SaleOrderController {
     }
 
     // 4.1 createFreight(method)
-    public void createFreight(String method) throws DataAccessException {
+    public void freightDecision(Boolean isFreight) throws DataAccessException {
     }
 
     // Optional: apply discount
