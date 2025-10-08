@@ -29,13 +29,6 @@ VALUES
 ('33333333', 'Nordic Music Supply', 'Industrivej 15', 'Denmark', 'contact@nordicmusic.dk');
 
 -- ==================================
--- Insert Warehouse
--- ==================================
-INSERT INTO dbo.Warehouse ([number], name, description)
-VALUES
-(1, 'Main Warehouse', 'Primary distribution center');
-
--- ==================================
 -- Insert Products
 -- ==================================
 
@@ -66,12 +59,12 @@ VALUES (1004, '9mm', 'Metal');
 -- ==================================
 -- Insert Stock
 -- ==================================
-INSERT INTO dbo.Stock (productNumber_FK, warehouseNumber_FK, availableQty, reservedQty)
+INSERT INTO dbo.Stock (productNumber_FK, availableQty, reservedQty)
 VALUES
-(1001, 1, 50, 0),
-(1002, 1, 100, 0),
-(1003, 1, 100, 0),
-(1004, 1, 100, 0);
+(1001, 50, 0),
+(1002, 100, 0),
+(1003, 100, 0),
+(1004, 100, 0);
 
 -- ==================================
 -- Insert Sale Prices (optional but valid for this schema)
