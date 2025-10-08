@@ -68,10 +68,10 @@ VALUES (1004, '9mm', 'Metal');
 -- ==================================
 INSERT INTO dbo.Stock (productNumber_FK, warehouseNumber_FK, availableQty, reservedQty)
 VALUES
-(1001, 1, 50, 5),
-(1002, 1, 100, 10),
-(1003, 1, 100, 10),
-(1004, 1, 100, 10);
+(1001, 1, 50, 0),
+(1002, 1, 100, 0),
+(1003, 1, 100, 0),
+(1004, 1, 100, 0);
 
 -- ==================================
 -- Insert Sale Prices (optional but valid for this schema)

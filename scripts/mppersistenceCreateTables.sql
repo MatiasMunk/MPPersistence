@@ -29,7 +29,7 @@ CREATE TABLE dbo.Customer (
     phoneNo    NVARCHAR(20) PRIMARY KEY,
     name       NVARCHAR(100) NOT NULL,
     address    NVARCHAR(200) NULL,
-    zipCity_FK    NVARCHAR(20)  NULL,
+    zipCity_FK NVARCHAR(20)  NULL,
     type       NVARCHAR(50)  NULL,
 	CONSTRAINT FK_Customer_zipCity FOREIGN KEY (zipCity_FK) REFERENCES dbo.CustomerDetails(zipcode)
 );
