@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import db.CustomerDB;
+import db.DBConnection;
 import db.DiscountDB;
 import db.FreightDB;
 import db.ProductDB;
@@ -38,6 +39,40 @@ public class SaleOrderController {
         productsInOrder = new ArrayList<>();
     }
     
+    public void startTransaction() throws DataAccessException {
+        try {
+            DBConnection.getInstance().startTransaction();
+            System.out.println("Transaction started in SaleOrderController.");
+        } catch (SQLException e) {
+            throw new DataAccessException(0x3001, e);
+        }
+    }
+
+    public void endTransaction() throws DataAccessException {
+        try {
+            DBConnection.getInstance().commitTransaction();
+            System.out.println("Transaction committed in SaleOrderController.");
+        } catch (SQLException e) {
+            try {
+                DBConnection.getInstance().rollbackTransaction();
+                System.out.println("Transaction rolled back due to error in SaleOrderController.");
+            } catch (SQLException ex) {
+                throw new DataAccessException(0x3003, ex);
+            }
+            throw new DataAccessException(0x3002, e);
+        }
+    }
+
+    public void rollbackTransaction() throws DataAccessException {
+        try {
+            DBConnection.getInstance().rollbackTransaction();
+            System.out.println("Transaction rolled back manually in SaleOrderController.");
+        } catch (SQLException e) {
+            throw new DataAccessException(0x3004, e);
+        }
+    }
+
+	
     // 1.1 create SaleOrder
     public SaleOrder placeOrder() throws DataAccessException {
         currentOrder = new SaleOrder(new Date(), 0.0, "Pending", new Date());
@@ -79,5 +114,6 @@ public class SaleOrderController {
 
     // 5.1 confirmation()
     public void confirmation() throws DataAccessException {
+    	//...
     }
 }

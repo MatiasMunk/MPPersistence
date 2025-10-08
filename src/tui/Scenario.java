@@ -23,6 +23,9 @@ public class Scenario {
 	    try {
 	        System.out.println("\n=== PLACE NEW ORDER ===");
 	        
+	     // Start transaction
+	        saleOrderController.startTransaction();
+	        
 	        // Step 1: Create the order
 	        System.out.println("Creating sale order...");
 	        SaleOrder order = saleOrderController.placeOrder(); // 1.1 in diagram
@@ -47,6 +50,9 @@ public class Scenario {
 
 	        // Step 4: Confirmation
 	        saleOrderController.confirmation(); // 5.1
+	        
+	        // Commit transaction
+	        saleOrderController.endTransaction();
 	        System.out.println("Order successfully placed!");
 
 	    } catch (DataAccessException e) {
