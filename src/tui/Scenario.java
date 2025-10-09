@@ -29,11 +29,10 @@ public class Scenario {
 	    try {
 	        System.out.println("\n=== PLACE NEW ORDER ===");
 	        
-	     // Start transaction
+	        // Start transaction
 	        saleOrderController.startTransaction();
 	        
 	        // Step 1: Create the order
-	        System.out.println("Creating sale order...");
 	        SaleOrder order = saleOrderController.placeOrder(); // 1.1 in diagram
 	        
 	        boolean addingProducts = true;

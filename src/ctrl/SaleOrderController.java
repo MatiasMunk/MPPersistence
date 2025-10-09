@@ -74,10 +74,12 @@ public class SaleOrderController {
         double amount = 0.0;
         String deliveryStatus = "Pending";
 
+        System.out.println("Creating sale order...");
         currentOrder = new SaleOrder(new Date(), 0.0, "Pending", new Date());
 
         // customerPhoneNo is added later
-        saleOrderDB.createOrder(null, orderDate, amount, deliveryStatus, deliveryDate);
+        int generatedID = saleOrderDB.createOrder(null, orderDate, amount, deliveryStatus, deliveryDate);
+        currentOrder.setId(generatedID);
         
         return currentOrder;
     }
@@ -93,6 +95,8 @@ public class SaleOrderController {
             for (int i = 0; i < quantity; i++) {
                 productsInOrder.add(p);
             }
+            
+            saleOrderDB.addOrderLineItem(currentOrder.getId(), productNumber, quantity);
 
             System.out.println(quantity + " × " + p.getName() + " added to order.");
 

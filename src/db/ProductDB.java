@@ -83,7 +83,6 @@ public class ProductDB implements ProductDBIF {
             throw new DataAccessException(0x1006, e);
         }
     }
-
     
     private Product buildObject(ResultSet rs) throws DataAccessException {
     	Product product;
