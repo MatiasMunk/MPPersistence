@@ -4,7 +4,7 @@ public class GunReplica {
 	private String caliber;
 	private String material;
     
-	public GunReplica(String caliber, String material) {
+	public GunReplica(int productNumber, String name, int minStock, String caliber, String material) {
 		this.caliber = caliber;
 		this.material = material;
 	}
@@ -26,8 +26,8 @@ public class GunReplica {
 		
 	}
 	
-	public static GunReplica gunReplica(String caliber, String material) {
-		return new GunReplica(caliber, material);
+	public static GunReplica gunReplica(int productNumber, String name, int minStock, String caliber, String material) {
+		return new GunReplica(productNumber, name, minStock, caliber, material);
 	}
 	
 }
