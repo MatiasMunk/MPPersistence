@@ -22,6 +22,7 @@ public class DBMessages {
 		lookup.put(0x1007, "Database error: Cannot update product");
 		lookup.put(0x1008, "Database error: Cannot add product");
 		lookup.put(0x1009, "Database error: Cannot build product");
+		lookup.put(0x1010, "Database error: Cannot add customer (phoneNo) to saleOrder");
 	}
 
 	public static String msg(int errorCode) {

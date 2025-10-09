@@ -60,5 +60,4 @@ public class SaleOrderDB implements SaleOrderDBIF {
             throw new DataAccessException(0x3002, e);
         }
     }
-
 }

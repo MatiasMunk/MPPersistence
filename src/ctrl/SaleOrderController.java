@@ -68,7 +68,6 @@ public class SaleOrderController {
     }
 
 	
-    // 1.1 create SaleOrder
     public SaleOrder placeOrder() throws DataAccessException {
     	LocalDate orderDate = LocalDate.now();
         LocalDate deliveryDate = orderDate.plusDays(3);
@@ -83,7 +82,6 @@ public class SaleOrderController {
         return currentOrder;
     }
 
-    // 2.1 addProduct(productNumber, quantity)
     public void addProduct(int productNumber, int quantity) throws DataAccessException {
         try {
             Product p = productController.findProductByNumber(productNumber);
@@ -118,7 +116,7 @@ public class SaleOrderController {
             System.out.println("Customer with phone " + phoneNumber + " added to current order.");
 
         } catch (Exception e) {
-            throw new DataAccessException(0x3001, e);
+            throw new DataAccessException(0x1010, e);
         }
     }
 
