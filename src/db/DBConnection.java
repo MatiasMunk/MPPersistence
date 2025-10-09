@@ -14,7 +14,8 @@ public class DBConnection {
 	private static final String PASSWORD = "Password1!";
 
 	private DBConnection() {
-		String urlString = String.format("jdbc:sqlserver://%s:%s;databaseName=%s;encrypt=false", SERVERNAME, PORTNUMBER, DBNAME);
+		String urlString = String.format("jdbc:sqlserver://%s:%s;databaseName=%s;encrypt=false", SERVERNAME, PORTNUMBER,
+				DBNAME);
 		try {
 			connection = DriverManager.getConnection(urlString, USERNAME, PASSWORD);
 		} catch (SQLException e) {
@@ -25,10 +26,10 @@ public class DBConnection {
 	}
 
 	public static DBConnection getInstance() {
-		if (instance == null) {
-			instance = new DBConnection();
-		}
-		return instance;
+	    if (instance == null) {
+	        instance = new DBConnection();
+	    }
+	    return instance;
 	}
 
 	public Connection getConnection() {
@@ -36,24 +37,47 @@ public class DBConnection {
 	}
 
 	public void startTransaction() throws SQLException {
+		if (connection == null || connection.isClosed()) {
+			throw new SQLException("Cannot start transaction: connection is null or closed.");
+		}
 		connection.setAutoCommit(false);
+		System.out.println("startTransaction Connection hash: " + System.identityHashCode(connection));
+
+		System.out.println("[DBConnection] autoCommit set to FALSE");
 	}
 
 	public void commitTransaction() throws SQLException {
+		if (connection == null || connection.isClosed()) {
+			throw new SQLException("Cannot commit: connection is null or closed.");
+		}
 		connection.commit();
 		connection.setAutoCommit(true);
+		System.out.println("commitTransaction Connection hash: " + System.identityHashCode(connection));
+
+		System.out.println("[DBConnection] Transaction COMMITTED (autoCommit TRUE)");
 	}
 
 	public void rollbackTransaction() throws SQLException {
-		connection.rollback();
+		if (connection == null || connection.isClosed()) {
+			System.err.println("Cannot rollback: connection is null or already closed.");
+			return;
+		}
+		System.out.println("rollbackTransaction Connection hash: " + System.identityHashCode(connection));
+
+		System.out.println("[DBConnection] Rollback requested, autoCommit=" + connection.getAutoCommit());
+		if (!connection.getAutoCommit()) {
+			connection.rollback();
+			System.out.println("Rollback successful.");
+		} else {
+			System.out.println("Skipped rollback — autoCommit=true (no transaction in progress).");
+		}
 		connection.setAutoCommit(true);
 	}
 
 	public void close() {
 		try {
 			DBConnection.getInstance().getConnection().close();
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			System.out.printf("Error: Cannot close connection to %s database!\n", DBNAME);
 		}
 	}
