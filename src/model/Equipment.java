@@ -8,13 +8,16 @@ public class Equipment {
 	public Equipment(int productNumber, String name, int minStock, String material, String style) {
 		this.material = material;
 		this.style = style;
+	}
 		
 		
 	public String getMaterial() {
 		return material;
+	}
 		
 	public void setMaterial(String material) {
-		this.material = material;
+		this.material = material; 
+	}
 		
 		
 	public String getStyle() {
