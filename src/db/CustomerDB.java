@@ -1,8 +1,10 @@
 package db;
 
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +13,29 @@ import model.Customer;
 
 public class CustomerDB implements CustomerDBIF {
     
+//	(String name, String address, String zipcode, String city, String phoneNumber, String type) {
+	
+	public List<Customer> findAllCustomers() throws DataAccessException {
+		List<Customer> customers = new ArrayList<>();
+	    String sql = "SELECT phoneNo, name, address, zipCity_FK, type FROM Customer";
+	    try (Statement stmt = DBConnection.getInstance().getConnection().createStatement();
+	         ResultSet rs = stmt.executeQuery(sql)) {
+	        while (rs.next()) {
+	            Customer c = new Customer(
+	                rs.getString("name"),
+	                rs.getString("address"),
+	                rs.getString("zipCity_FK"),
+	                rs.getString("phoneNo"),
+	                rs.getString("type")
+	            );
+	            customers.add(c);
+	        }
+	    } catch (SQLException e) {
+	        throw new DataAccessException(0x1010, e);
+	    }
+	    return customers;
+	}
+	
     public Customer findCustomerByPhone(int phone) throws DataAccessException {
         Customer customer = null;
 		String template = "SELECT * FROM Customers WHERE phoneNo = ?;";

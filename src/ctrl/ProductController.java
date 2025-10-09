@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import db.DBConnection;
 import db.DataAccessException;
@@ -18,6 +19,10 @@ public class ProductController {
 	public ProductController() {
 		if(this.productDB == null)
 			this.productDB = new ProductDB();
+	}
+	
+	public List<Product> findAllProducts() throws DataAccessException {
+	    return productDB.findAllProducts(); // returns List<Product>
 	}
 	
 	public Product findProductByNumber(int productNumber) throws DataAccessException {

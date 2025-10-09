@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,25 @@ import model.Product;
 
 public class ProductDB implements ProductDBIF {
     
-
+	public List<Product> findAllProducts() throws DataAccessException {
+		List<Product> products = new ArrayList<>();
+	    String sql = "SELECT productNumber, name, minStock FROM Product";
+	    try (Statement stmt = DBConnection.getInstance().getConnection().createStatement();
+	         ResultSet rs = stmt.executeQuery(sql)) {
+	        while (rs.next()) {
+	            Product p = new Product(
+	                rs.getInt("productNumber"),
+	                rs.getString("name"),
+	                rs.getInt("minStock")
+	            );
+	            products.add(p);
+	        }
+	    } catch (SQLException e) {
+	        throw new DataAccessException(0x1011, e);
+	    }
+	    return products;
+	}
+	
     public Product findProductByNumber(int productNumber) throws DataAccessException {
     	Product product = null;
 		String template = "SELECT * FROM Product WHERE productNumber = ?;";
