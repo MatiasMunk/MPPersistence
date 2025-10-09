@@ -1,40 +1,35 @@
 package ctrl;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import db.CustomerDB;
 import db.DBConnection;
-import db.DiscountDB;
-import db.FreightDB;
-import db.ProductDB;
+
+
+import db.SaleOrderDBIF;
 import db.SaleOrderDB;
 import db.DataAccessException;
 
-import model.Customer;
-import model.Discount;
-import model.Freight;
-import model.Invoice;
 import model.Product;
 import model.SaleOrder;
 
 public class SaleOrderController {
     private SaleOrder currentOrder;
-    private final ProductDB productDB;
-    private final CustomerDB customerDB;
-    private final FreightDB freightDB;
-    private final DiscountDB discountDB;
-    private final SaleOrderDB saleOrderDB;
+    
+    private final ProductController productController;
+    private final CustomerController customerController;
+    
+    private final SaleOrderDBIF saleOrderDB;
 
     private final List<Product> productsInOrder;
 
     public SaleOrderController() {
-        productDB = new ProductDB();
-        customerDB = new CustomerDB();
-        freightDB = new FreightDB();
-        discountDB = new DiscountDB();
+        productController = new ProductController();
+        customerController = new CustomerController();
+        
         saleOrderDB = new SaleOrderDB();
         productsInOrder = new ArrayList<>();
     }
@@ -44,7 +39,7 @@ public class SaleOrderController {
             DBConnection.getInstance().startTransaction();
             System.out.println("Transaction started in SaleOrderController.");
         } catch (SQLException e) {
-            throw new DataAccessException(0x3001, e);
+            throw new DataAccessException(0x1001, e);
         }
     }
 
@@ -57,9 +52,9 @@ public class SaleOrderController {
                 DBConnection.getInstance().rollbackTransaction();
                 System.out.println("Transaction rolled back due to error in SaleOrderController.");
             } catch (SQLException ex) {
-                throw new DataAccessException(0x3003, ex);
+                throw new DataAccessException(0x1002, ex);
             }
-            throw new DataAccessException(0x3002, e);
+            throw new DataAccessException(0x1002, e);
         }
     }
 
@@ -68,26 +63,36 @@ public class SaleOrderController {
             DBConnection.getInstance().rollbackTransaction();
             System.out.println("Transaction rolled back manually in SaleOrderController.");
         } catch (SQLException e) {
-            throw new DataAccessException(0x3004, e);
+            throw new DataAccessException(0x1003, e);
         }
     }
 
 	
     // 1.1 create SaleOrder
     public SaleOrder placeOrder() throws DataAccessException {
+    	LocalDate orderDate = LocalDate.now();
+        LocalDate deliveryDate = orderDate.plusDays(3); // example: delivery in 3 days
+        double amount = 0.0;
+        String deliveryStatus = "Pending";
+
+        // Create model object
         currentOrder = new SaleOrder(new Date(), 0.0, "Pending", new Date());
+
+        // Persist in database (customerPhoneNo is added later)
+        saleOrderDB.createOrder(null, orderDate, amount, deliveryStatus, deliveryDate);
+        
         return currentOrder;
     }
 
     // 2.1 addProduct(productNumber, quantity)
     public void addProduct(int productNumber, int quantity) throws DataAccessException {
         try {
-            Product p = productDB.findProductByNumber(productNumber);
+            Product p = productController.findProductByNumber(productNumber);
             if (p == null) {
                 throw new SQLException();
             }
 
-            productDB.reserveProduct(productNumber, quantity);
+            productController.reserveProduct(productNumber, quantity);
             for (int i = 0; i < quantity; i++) {
                 productsInOrder.add(p);
             }
@@ -95,8 +100,7 @@ public class SaleOrderController {
             System.out.println(quantity + " × " + p.getName() + " added to order.");
 
         } catch (SQLException e) {
-            // Wrap in DataAccessException with product-specific error code
-            throw new DataAccessException(0x10F2, e);
+            throw new DataAccessException(0x1008, e);
         }
     }
 

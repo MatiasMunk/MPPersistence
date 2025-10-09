@@ -27,7 +27,7 @@ public class ProductDB implements ProductDBIF {
 			}
 		}
 		catch (SQLException e) {
-			throw new DataAccessException(0x1021, e);
+			throw new DataAccessException(0x1005, e);
 		}
 		return product;
     }
@@ -72,7 +72,7 @@ public class ProductDB implements ProductDBIF {
         }
         catch (SQLException e) {
             try { conn.rollback(); } catch (SQLException ignore) {}
-            throw new DataAccessException(0x1040, e);
+            throw new DataAccessException(0x1006, e);
         }
         finally {
             try { conn.setAutoCommit(true); } catch (SQLException ignore) {}
@@ -86,7 +86,7 @@ public class ProductDB implements ProductDBIF {
 			product = new Product(rs.getInt("productNumber"), rs.getString("name"), rs.getInt("minStock"));
 		}
 		catch (SQLException e) {
-			throw new DataAccessException(0x10F1, e);
+			throw new DataAccessException(0x1009, e);
 		}
 		return product;
 	}
@@ -100,7 +100,7 @@ public class ProductDB implements ProductDBIF {
 			}
 		}
 		catch (SQLException e) {
-			throw new DataAccessException(0x10F2, e);
+			throw new DataAccessException(0x1009, e);
 		}
 		return products;
 	}
