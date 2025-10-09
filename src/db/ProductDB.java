@@ -61,7 +61,6 @@ public class ProductDB implements ProductDBIF {
             System.out.println(quantity + " units of product " + productNumber + " reserved.");
         }
         catch (SQLException e) {
-            try { conn.rollback(); } catch (SQLException ignore) {}
             throw new DataAccessException(0x1006, e);
         }
     }
