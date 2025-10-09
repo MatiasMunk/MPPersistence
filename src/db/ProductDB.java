@@ -41,8 +41,6 @@ public class ProductDB implements ProductDBIF {
             PreparedStatement checkStmt = conn.prepareStatement(checkStockSQL);
             PreparedStatement updateStmt = conn.prepareStatement(updateStockSQL)
         ) {
-            conn.setAutoCommit(false);
-
             checkStmt.setInt(1, productNumber);
             ResultSet rs = checkStmt.executeQuery();
 
@@ -67,15 +65,11 @@ public class ProductDB implements ProductDBIF {
                 throw new SQLException();
             }
 
-            conn.commit();
             System.out.println(quantity + " units of product " + productNumber + " reserved.");
         }
         catch (SQLException e) {
             try { conn.rollback(); } catch (SQLException ignore) {}
             throw new DataAccessException(0x1006, e);
-        }
-        finally {
-            try { conn.setAutoCommit(true); } catch (SQLException ignore) {}
         }
     }
 
