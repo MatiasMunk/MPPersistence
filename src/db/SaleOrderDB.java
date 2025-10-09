@@ -33,7 +33,7 @@ public class SaleOrderDB implements SaleOrderDBIF {
             	    .replaceFirst("\\?", "'" + deliveryStatus + "'")
             	    .replaceFirst("\\?", "'" + Date.valueOf(deliveryDate) + "'");
 
-            	System.out.println("Executing SQL: " + debugSql);
+            	//System.out.println("Executing SQL: " + debugSql);
 
             	
             ps.executeUpdate();

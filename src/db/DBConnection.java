@@ -41,9 +41,6 @@ public class DBConnection {
 			throw new SQLException("Cannot start transaction: connection is null or closed.");
 		}
 		connection.setAutoCommit(false);
-		System.out.println("startTransaction Connection hash: " + System.identityHashCode(connection));
-
-		System.out.println("[DBConnection] autoCommit set to FALSE");
 	}
 
 	public void commitTransaction() throws SQLException {
@@ -52,9 +49,6 @@ public class DBConnection {
 		}
 		connection.commit();
 		connection.setAutoCommit(true);
-		System.out.println("commitTransaction Connection hash: " + System.identityHashCode(connection));
-
-		System.out.println("[DBConnection] Transaction COMMITTED (autoCommit TRUE)");
 	}
 
 	public void rollbackTransaction() throws SQLException {
@@ -62,14 +56,8 @@ public class DBConnection {
 			System.err.println("Cannot rollback: connection is null or already closed.");
 			return;
 		}
-		System.out.println("rollbackTransaction Connection hash: " + System.identityHashCode(connection));
-
-		System.out.println("[DBConnection] Rollback requested, autoCommit=" + connection.getAutoCommit());
 		if (!connection.getAutoCommit()) {
 			connection.rollback();
-			System.out.println("Rollback successful.");
-		} else {
-			System.out.println("Skipped rollback — autoCommit=true (no transaction in progress).");
 		}
 		connection.setAutoCommit(true);
 	}
