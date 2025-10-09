@@ -7,6 +7,8 @@ public class Invoice {
 	private double totalAmount;
 	
 	
+	public Invoice() {
+		}	
 	
 	public int getInvoiceNo() {
 		return invoiceNo;
@@ -39,8 +41,12 @@ public class Invoice {
 	
 	public void setTotalAmount(double totalAmount) {
 		this.totalAmount = totalAmount;
-	}
+		}
 	
+	 public void updateInfo(double amount, String customerType, double freightCost, double discountCost, double vat) {
+	        this.amount = amount;
+	        this.vat = vat;
+	    }
 	
 
 }
