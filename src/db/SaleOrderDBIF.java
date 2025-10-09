@@ -1,5 +1,7 @@
 package db;
 
-public interface SaleOrderDBIF {
+import java.time.LocalDate;
 
+public interface SaleOrderDBIF {
+	public void createOrder(String customerPhoneNo, LocalDate date, double amount, String deliveryStatus, LocalDate deliveryDate) throws DataAccessException;
 }
