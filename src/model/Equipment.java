@@ -16,11 +16,7 @@ public class Equipment {
 	}
 		
 	public void setMaterial(String material) {
-<<<<<<< Updated upstream
 		this.material = material; 
-=======
-		this.material = material;
->>>>>>> Stashed changes
 	}
 		
 		
