@@ -53,5 +53,12 @@ public class Customer {
 		this.type = type;
 	}
 	
-	
+	@Override
+	public String toString() {
+	    return "Customer[phoneNo=" + phoneNo +
+	           ", name=" + name +
+	           ", address=" + address +
+	           ", city=" + city +
+	           ", type=" + type + "]";
+	}
 }

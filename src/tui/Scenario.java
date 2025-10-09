@@ -85,11 +85,7 @@ public class Scenario {
 
 	        System.out.println("\n=== ALL CUSTOMERS ===");
 	        for (Customer c : customers) {
-	            System.out.println("Phone: " + c.getPhoneNo()
-	                               + ", Name: " + c.getName()
-	                               + ", Address: " + c.getAddress()
-	                               + ", City: " + c.getCity()
-	                               + ", Type: " + c.getType());
+	        	System.out.println(c);
 	        }
 	    } catch (DataAccessException e) {
 	        System.out.println("Error fetching customers: " + e.getMessage());
@@ -103,9 +99,7 @@ public class Scenario {
 
 	        System.out.println("\n=== ALL PRODUCTS ===");
 	        for (Product p : products) {
-	            System.out.println("Product No: " + p.getProductNumber()
-	                               + ", Name: " + p.getName()
-	                               + ", minStock: " + p.getMinStock());
+	        	System.out.println(p);
 	        }
 	    } catch (DataAccessException e) {
 	        System.out.println("Error fetching products: " + e.getMessage());

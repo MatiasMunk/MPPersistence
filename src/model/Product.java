@@ -34,4 +34,11 @@ public class Product {
 		this.minStock = minStock;	
 	}
 	
+	@Override
+	public String toString() {
+	    return "Product[productNumber=" + productNumber +
+	           ", name=" + name +
+	           ", minStock=" + minStock + "]";
+	}
+
 }
