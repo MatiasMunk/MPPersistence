@@ -10,6 +10,28 @@ public class Product {
         this.name = name;
         this.minStock = minStock;
     }
-
-    public String getName() { return name; }
+    public int getProductNumber() {
+		return productNumber;
+	}
+    
+    public void setProductNumber(int productNumber) {
+    	this.productNumber = productNumber;	
+    }
+    
+    public String getName() {
+		return name;
+	}
+    
+    public void setName(String name) {
+		this.name = name;	
+	}
+	
+	public int getMinStock() {
+		return minStock;
+	}
+	
+	public void setMinStock(int minStock) {
+		this.minStock = minStock;	
+	}
+	
 }
