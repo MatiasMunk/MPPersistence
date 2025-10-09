@@ -45,25 +45,18 @@ public class ProductDB implements ProductDBIF {
             ResultSet rs = checkStmt.executeQuery();
 
             if (!rs.next()) {
-                conn.rollback();
                 throw new SQLException();
             }
 
             int available = rs.getInt("availableQty");
             if (available < quantity) {
-                conn.rollback();
                 throw new SQLException();
             }
 
             updateStmt.setInt(1, quantity);
             updateStmt.setInt(2, quantity);
             updateStmt.setInt(3, productNumber);
-            int affected = updateStmt.executeUpdate();
-
-            if (affected == 0) {
-                conn.rollback();
-                throw new SQLException();
-            }
+            updateStmt.executeUpdate();
 
             System.out.println(quantity + " units of product " + productNumber + " reserved.");
         }
