@@ -10,7 +10,6 @@ import java.util.Map;
 
 import db.DBConnection;
 
-
 import db.SaleOrderDBIF;
 import dk.raptus.KeyboardReader;
 import db.SaleOrderDB;

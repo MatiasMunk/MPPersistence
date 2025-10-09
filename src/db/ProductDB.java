@@ -129,10 +129,16 @@ public class ProductDB implements ProductDBIF {
                 DELETE FROM OrderLineItem
                 WHERE saleOrderID_FK = ? AND productNumber_FK = ?;
             """;
+        
+        String deleteSaleOrderSQL = """
+                DELETE FROM SaleOrder
+                WHERE saleOrderID = ?;
+            """;
 
             try (
                 PreparedStatement psReset = conn.prepareStatement(resetStockSQL);
-                PreparedStatement psDelete = conn.prepareStatement(deleteLineItemSQL)
+                PreparedStatement psDelete = conn.prepareStatement(deleteLineItemSQL);
+            	PreparedStatement psDeleteOrder = conn.prepareStatement(deleteSaleOrderSQL);
             ) {
                 // 1️⃣ Reset reservedQty in Stock
             	psReset.setInt(1, quantity);
@@ -143,12 +149,19 @@ public class ProductDB implements ProductDBIF {
                     throw new SQLException("No stock updated for product " + productNumber);
                 }
 
-                // 2️⃣ Delete the order line item
+             // 2️⃣ Delete the order line item
                 psDelete.setInt(1, saleOrderId);
                 psDelete.setInt(2, productNumber);
                 int affectedLine = psDelete.executeUpdate();
                 if (affectedLine == 0) {
                     throw new SQLException("No OrderLineItem deleted for order " + saleOrderId + " and product " + productNumber);
+                }
+                
+                // 3 Delete the sale order
+                psDeleteOrder.setInt(1, saleOrderId);
+                int affectedOrder = psDeleteOrder.executeUpdate();
+                if (affectedOrder == 0) {
+                    throw new SQLException("No SaleOrder deleted for order " + saleOrderId);
                 }
 
                 System.out.println("Reset " + quantity + " units of product " + productNumber + " and deleted OrderLineItem.");
