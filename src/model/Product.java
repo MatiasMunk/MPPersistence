@@ -31,7 +31,7 @@ public class Product {
 	}
 	
 	public void setMinStock(int minStock) {
-		this.minStock = minStock;	
+		this.minStock = minStock;
 	}
 	
 	@Override

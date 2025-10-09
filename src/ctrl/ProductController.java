@@ -32,4 +32,12 @@ public class ProductController {
     public void reserveProduct(int productNumber, int quantity) throws DataAccessException {
         productDB.reserveProduct(productNumber, quantity);
     }
+    
+    public void unreserveProduct(int productNumber, int quantity) throws DataAccessException {
+        productDB.unreserveProduct(productNumber, quantity);
+    }
+    
+    public void resetAvailable(int productNumber, int quantity) throws DataAccessException {
+        productDB.resetAvailable(productNumber, quantity);
+    }
 }

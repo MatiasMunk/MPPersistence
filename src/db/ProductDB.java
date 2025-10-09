@@ -84,6 +84,70 @@ public class ProductDB implements ProductDBIF {
         }
     }
     
+    public void unreserveProduct(int productNumber, int quantity) throws DataAccessException {
+        String sql = """
+            UPDATE Stock 
+            SET reservedQty  = reservedQty - ?
+            WHERE productNumber_FK = ?;
+        """;
+
+        Connection conn = DBConnection.getInstance().getConnection();
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, quantity);
+            ps.setInt(2, productNumber);
+
+            String debugSql = sql
+                .replaceFirst("\\?", String.valueOf(quantity))
+                .replaceFirst("\\?", String.valueOf(quantity))
+                .replaceFirst("\\?", String.valueOf(productNumber));
+
+            System.out.println("[DEBUG] Unreserving product: " + debugSql);
+
+            int affected = ps.executeUpdate();
+            if (affected == 0) {
+                throw new SQLException();
+            }
+
+            System.out.println(quantity + " units of product " + productNumber + " unreserved.");
+        } catch (SQLException e) {
+            throw new DataAccessException(0x1016, e);
+        }
+    }
+    
+    public void resetAvailable(int productNumber, int quantity) throws DataAccessException {
+        String sql = """
+            UPDATE Stock 
+            SET reservedQty  = reservedQty - ?,
+            availableQty  = availableQty + ?
+            WHERE productNumber_FK = ?;
+        """;
+
+        Connection conn = DBConnection.getInstance().getConnection();
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        	ps.setInt(1, quantity);
+        	ps.setInt(2, quantity);
+            ps.setInt(3, productNumber);
+
+            String debugSql = sql
+                .replaceFirst("\\?", String.valueOf(quantity))
+                .replaceFirst("\\?", String.valueOf(quantity))
+                .replaceFirst("\\?", String.valueOf(productNumber));
+
+            System.out.println("[DEBUG] Resetting available products: " + debugSql);
+
+            int affected = ps.executeUpdate();
+            if (affected == 0) {
+                throw new SQLException();
+            }
+
+            System.out.println(quantity + " units of product " + productNumber + " reset.");
+        } catch (SQLException e) {
+            throw new DataAccessException(0x1016, e);
+        }
+    }
+    
     private Product buildObject(ResultSet rs) throws DataAccessException {
     	Product product;
 		try {

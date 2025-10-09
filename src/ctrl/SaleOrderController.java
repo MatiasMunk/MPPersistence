@@ -4,12 +4,15 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import db.DBConnection;
 
 
 import db.SaleOrderDBIF;
+import dk.raptus.KeyboardReader;
 import db.SaleOrderDB;
 import db.DataAccessException;
 
@@ -17,7 +20,9 @@ import model.Product;
 import model.SaleOrder;
 
 public class SaleOrderController {
-    private SaleOrder currentOrder;
+	private KeyboardReader kr;
+	
+	private SaleOrder currentOrder;
     
     private final ProductController productController;
     private final CustomerController customerController;
@@ -27,6 +32,8 @@ public class SaleOrderController {
     private final List<Product> productsInOrder;
 
     public SaleOrderController() {
+    	kr = KeyboardReader.getInstance();
+    	
         productController = new ProductController();
         customerController = new CustomerController();
         
@@ -93,6 +100,7 @@ public class SaleOrderController {
 
             productController.reserveProduct(productNumber, quantity);
             for (int i = 0; i < quantity; i++) {
+            	System.out.println("Product: " + productNumber + " added to order");
                 productsInOrder.add(p);
             }
             
@@ -125,16 +133,49 @@ public class SaleOrderController {
     }
 
 
-    // 4.1 createFreight(method)
     public void freightDecision(Boolean isFreight) throws DataAccessException {
     }
 
-    // Optional: apply discount
     public void addDiscount(String type) throws DataAccessException {
     }
 
-    // 5.1 confirmation()
     public void confirmation() throws DataAccessException {
-    	//...
+        String confirm = kr.readString("Confirm order? (y/n): ");
+
+        System.out.println("Order cancelled — rolling back stock reservations...");
+        
+        //Unreserve product
+        if (!confirm.equalsIgnoreCase("n")) {
+	        // Go through all products in the current order
+	        Map<Integer, Integer> productQuantities = new HashMap<>();
+	        for (Product p : productsInOrder) {
+	        	System.out.println("Product in order: " + p.getName());
+	            productQuantities.put(
+	                p.getProductNumber(),
+	                productQuantities.getOrDefault(p.getProductNumber(), 0) + 1
+	            );
+	        }
+	
+	        // Now unreserve each unique product with the correct total quantity
+	        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
+	        	System.out.println("Unreserving product");
+	            productController.unreserveProduct(entry.getKey(), entry.getValue());
+	        }
+        } else if (!confirm.equalsIgnoreCase("y")) {
+	        Map<Integer, Integer> productQuantities = new HashMap<>();
+	        for (Product p : productsInOrder) {
+	        	System.out.println("Product in order: " + p.getName());
+	            productQuantities.put(
+	                p.getProductNumber(),
+	                productQuantities.getOrDefault(p.getProductNumber(), 0) + 1
+	            );
+	        }
+	
+	        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
+	        	System.out.println("Unreserving product");
+	            productController.resetAvailable(entry.getKey(), entry.getValue());
+	        }
+        }
     }
+
 }
