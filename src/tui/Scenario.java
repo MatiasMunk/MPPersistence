@@ -33,7 +33,7 @@ public class Scenario {
 	        saleOrderController.startTransaction();
 	        
 	        // Step 1: Create the order
-	        SaleOrder order = saleOrderController.placeOrder(); // 1.1 in diagram
+	        SaleOrder order = saleOrderController.placeOrder();
 	        
 	        boolean addingProducts = true;
 	        while (addingProducts) {
@@ -47,18 +47,17 @@ public class Scenario {
 
 	        // Step 2: Add customer
 	        int phoneNumber = kr.readInt("Enter customer phone number: ", "You must type in an integer: ");
-	        saleOrderController.addCustomer(phoneNumber); // 3.1
+	        saleOrderController.addCustomer(phoneNumber);
 
 	        // Step 3: Freight
 	        int method = kr.readInt("Enter freight method (0 = no freight/1 = freight): ", "You must type in an integer: ");
-	        saleOrderController.freightDecision(method == 0 ? false : true); // 4.1
+	        saleOrderController.freightDecision(method == 0 ? false : true);
 
 	        // Step 4: Confirmation
-	        saleOrderController.confirmation(); // 5.1
+	        saleOrderController.confirmation();
 	        
 	        // Commit transaction
 	        saleOrderController.endTransaction();
-	        System.out.println("Order successfully placed!");
 
 	    } catch (DataAccessException e) {
 	        System.out.println("Database error: " + e.getMessage());

@@ -102,7 +102,7 @@ public class ProductDB implements ProductDBIF {
                 .replaceFirst("\\?", String.valueOf(quantity))
                 .replaceFirst("\\?", String.valueOf(productNumber));
 
-            System.out.println("[DEBUG] Unreserving product: " + debugSql);
+            //System.out.println("[DEBUG] Unreserving product: " + debugSql);
 
             int affected = ps.executeUpdate();
             if (affected == 0) {
@@ -115,8 +115,8 @@ public class ProductDB implements ProductDBIF {
         }
     }
     
-    public void resetAvailable(int productNumber, int quantity) throws DataAccessException {
-        String sql = """
+    public void resetOrder(int saleOrderId, int productNumber, int quantity) throws DataAccessException {
+        String resetStockSQL = """
             UPDATE Stock 
             SET reservedQty  = reservedQty - ?,
             availableQty  = availableQty + ?
@@ -125,27 +125,37 @@ public class ProductDB implements ProductDBIF {
 
         Connection conn = DBConnection.getInstance().getConnection();
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-        	ps.setInt(1, quantity);
-        	ps.setInt(2, quantity);
-            ps.setInt(3, productNumber);
+        String deleteLineItemSQL = """
+                DELETE FROM OrderLineItem
+                WHERE saleOrderID_FK = ? AND productNumber_FK = ?;
+            """;
 
-            String debugSql = sql
-                .replaceFirst("\\?", String.valueOf(quantity))
-                .replaceFirst("\\?", String.valueOf(quantity))
-                .replaceFirst("\\?", String.valueOf(productNumber));
+            try (
+                PreparedStatement psReset = conn.prepareStatement(resetStockSQL);
+                PreparedStatement psDelete = conn.prepareStatement(deleteLineItemSQL)
+            ) {
+                // 1️⃣ Reset reservedQty in Stock
+            	psReset.setInt(1, quantity);
+            	psReset.setInt(2, quantity);
+                psReset.setInt(3, productNumber);
+                int affectedStock = psReset.executeUpdate();
+                if (affectedStock == 0) {
+                    throw new SQLException("No stock updated for product " + productNumber);
+                }
 
-            System.out.println("[DEBUG] Resetting available products: " + debugSql);
+                // 2️⃣ Delete the order line item
+                psDelete.setInt(1, saleOrderId);
+                psDelete.setInt(2, productNumber);
+                int affectedLine = psDelete.executeUpdate();
+                if (affectedLine == 0) {
+                    throw new SQLException("No OrderLineItem deleted for order " + saleOrderId + " and product " + productNumber);
+                }
 
-            int affected = ps.executeUpdate();
-            if (affected == 0) {
-                throw new SQLException();
+                System.out.println("Reset " + quantity + " units of product " + productNumber + " and deleted OrderLineItem.");
+
+            } catch (SQLException e) {
+                throw new DataAccessException(0x1016, e);
             }
-
-            System.out.println(quantity + " units of product " + productNumber + " reset.");
-        } catch (SQLException e) {
-            throw new DataAccessException(0x1016, e);
-        }
     }
     
     private Product buildObject(ResultSet rs) throws DataAccessException {

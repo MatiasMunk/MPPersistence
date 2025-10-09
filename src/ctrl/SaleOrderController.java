@@ -144,37 +144,40 @@ public class SaleOrderController {
 
         System.out.println("Order cancelled — rolling back stock reservations...");
         
-        //Unreserve product
-        if (!confirm.equalsIgnoreCase("n")) {
-	        // Go through all products in the current order
+        if (confirm.equalsIgnoreCase("y")) {
+	        // Unreserve products since order goes through
 	        Map<Integer, Integer> productQuantities = new HashMap<>();
 	        for (Product p : productsInOrder) {
 	        	System.out.println("Product in order: " + p.getName());
 	            productQuantities.put(
 	                p.getProductNumber(),
-	                productQuantities.getOrDefault(p.getProductNumber(), 0) + 1
+	                productQuantities.getOrDefault(p.getProductNumber(), 0) + 1 // Quantity of product in order
 	            );
 	        }
 	
-	        // Now unreserve each unique product with the correct total quantity
 	        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
 	        	System.out.println("Unreserving product");
 	            productController.unreserveProduct(entry.getKey(), entry.getValue());
 	        }
-        } else if (!confirm.equalsIgnoreCase("y")) {
+	        
+	        System.out.println("Order successfully placed!");
+        } else if (confirm.equalsIgnoreCase("n")) {
+        	// Reset Order changes in database
 	        Map<Integer, Integer> productQuantities = new HashMap<>();
 	        for (Product p : productsInOrder) {
 	        	System.out.println("Product in order: " + p.getName());
 	            productQuantities.put(
 	                p.getProductNumber(),
-	                productQuantities.getOrDefault(p.getProductNumber(), 0) + 1
+	                productQuantities.getOrDefault(p.getProductNumber(), 0) + 1 // Quantity of product in order
 	            );
 	        }
 	
 	        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
 	        	System.out.println("Unreserving product");
-	            productController.resetAvailable(entry.getKey(), entry.getValue());
+	            productController.resetOrder(currentOrder.getId(), entry.getKey(), entry.getValue());
 	        }
+	        
+	        System.out.println("Order successfully cancelled!");
         }
     }
 

@@ -37,7 +37,7 @@ public class ProductController {
         productDB.unreserveProduct(productNumber, quantity);
     }
     
-    public void resetAvailable(int productNumber, int quantity) throws DataAccessException {
-        productDB.resetAvailable(productNumber, quantity);
+    public void resetOrder(int saleOrderId, int productNumber, int quantity) throws DataAccessException {
+        productDB.resetOrder(saleOrderId, productNumber, quantity);
     }
 }
