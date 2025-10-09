@@ -49,5 +49,16 @@ public class SaleOrderDB implements SaleOrderDBIF {
             }
         }
     }
+    
+    public void addCustomerToOrder(String customerPhoneNo) throws DataAccessException {
+        String sql = "UPDATE SaleOrder SET customerPhoneNo_FK = ? WHERE saleOrderId = (SELECT MAX(saleOrderId) FROM SaleOrder)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, customerPhoneNo);
+            ps.executeUpdate();
+            System.out.println("Customer linked to sale order successfully.");
+        } catch (SQLException e) {
+            throw new DataAccessException(0x3002, e);
+        }
+    }
 
 }

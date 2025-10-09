@@ -13,7 +13,7 @@ import model.SaleOrder;
 public class Scenario {
 	private KeyboardReader kr;
 	private SaleOrderController saleOrderController;
-
+	
 	public Scenario() {
 		kr = KeyboardReader.getInstance();
 		saleOrderController = new SaleOrderController();

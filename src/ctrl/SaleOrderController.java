@@ -71,14 +71,13 @@ public class SaleOrderController {
     // 1.1 create SaleOrder
     public SaleOrder placeOrder() throws DataAccessException {
     	LocalDate orderDate = LocalDate.now();
-        LocalDate deliveryDate = orderDate.plusDays(3); // example: delivery in 3 days
+        LocalDate deliveryDate = orderDate.plusDays(3);
         double amount = 0.0;
         String deliveryStatus = "Pending";
 
-        // Create model object
         currentOrder = new SaleOrder(new Date(), 0.0, "Pending", new Date());
 
-        // Persist in database (customerPhoneNo is added later)
+        // customerPhoneNo is added later
         saleOrderDB.createOrder(null, orderDate, amount, deliveryStatus, deliveryDate);
         
         return currentOrder;
@@ -104,9 +103,25 @@ public class SaleOrderController {
         }
     }
 
-    // 3.1 addCustomer(phoneNumber)
     public void addCustomer(int phoneNumber) throws DataAccessException {
+        try {
+            // Store in current order
+            if (currentOrder == null) {
+                throw new IllegalStateException("No current order exists.");
+            }
+
+            String phoneStr = String.valueOf(phoneNumber);
+
+            // Update in DB
+            saleOrderDB.addCustomerToOrder(phoneStr);
+
+            System.out.println("Customer with phone " + phoneNumber + " added to current order.");
+
+        } catch (Exception e) {
+            throw new DataAccessException(0x3001, e);
+        }
     }
+
 
     // 4.1 createFreight(method)
     public void freightDecision(Boolean isFreight) throws DataAccessException {
