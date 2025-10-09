@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import db.DBConnection;
-
 import db.SaleOrderDBIF;
 import dk.raptus.KeyboardReader;
 import db.SaleOrderDB;
@@ -17,29 +16,32 @@ import db.DataAccessException;
 
 import model.Product;
 import model.SaleOrder;
+import model.Customer;
 
 public class SaleOrderController {
-	private KeyboardReader kr;
-	
-	private SaleOrder currentOrder;
-    
+    private KeyboardReader kr;
+
+    private SaleOrder currentOrder;
+    private Customer currentCustomer;           
+    private Integer currentCustomerPhone;       
+
     private final ProductController productController;
     private final CustomerController customerController;
-    
+
     private final SaleOrderDBIF saleOrderDB;
 
     private final List<Product> productsInOrder;
 
     public SaleOrderController() {
-    	kr = KeyboardReader.getInstance();
-    	
+        kr = KeyboardReader.getInstance();
+
         productController = new ProductController();
         customerController = new CustomerController();
-        
+
         saleOrderDB = new SaleOrderDB();
         productsInOrder = new ArrayList<>();
     }
-    
+
     public void startTransaction() throws DataAccessException {
         try {
             DBConnection.getInstance().startTransaction();
@@ -73,9 +75,8 @@ public class SaleOrderController {
         }
     }
 
-	
     public SaleOrder placeOrder() throws DataAccessException {
-    	LocalDate orderDate = LocalDate.now();
+        LocalDate orderDate = LocalDate.now();
         LocalDate deliveryDate = orderDate.plusDays(3);
         double amount = 0.0;
         String deliveryStatus = "Pending";
@@ -83,10 +84,13 @@ public class SaleOrderController {
         System.out.println("Creating sale order...");
         currentOrder = new SaleOrder(new Date(), 0.0, "Pending", new Date());
 
-        // customerPhoneNo is added later
         int generatedID = saleOrderDB.createOrder(null, orderDate, amount, deliveryStatus, deliveryDate);
         currentOrder.setId(generatedID);
-        
+
+        // reset current customer for the new order
+        currentCustomer = null;
+        currentCustomerPhone = null;
+
         return currentOrder;
     }
 
@@ -99,10 +103,10 @@ public class SaleOrderController {
 
             productController.reserveProduct(productNumber, quantity);
             for (int i = 0; i < quantity; i++) {
-            	System.out.println("Product: " + productNumber + " added to order");
+                System.out.println("Product: " + productNumber + " added to order");
                 productsInOrder.add(p);
             }
-            
+
             saleOrderDB.addOrderLineItem(currentOrder.getId(), productNumber, quantity);
 
             System.out.println(quantity + " × " + p.getName() + " added to order.");
@@ -114,14 +118,20 @@ public class SaleOrderController {
 
     public void addCustomer(int phoneNumber) throws DataAccessException {
         try {
-            // Store in current order
             if (currentOrder == null) {
                 throw new IllegalStateException("No current order exists.");
             }
 
-            String phoneStr = String.valueOf(phoneNumber);
+            // find and cache the current customer
+            Customer found = customerController.findCustomerByPhone(phoneNumber);
+            if (found == null) {
+                throw new IllegalStateException("No customer found with phone: " + phoneNumber);
+            }
+            currentCustomer = found;
+            currentCustomerPhone = phoneNumber;
 
-            // Update in DB
+            // Update DB with the phone (existing API)
+            String phoneStr = String.valueOf(phoneNumber);
             saleOrderDB.addCustomerToOrder(phoneStr);
 
             System.out.println("Customer with phone " + phoneNumber + " added to current order.");
@@ -131,6 +141,10 @@ public class SaleOrderController {
         }
     }
 
+    // Expose the current customer for the current order
+    public Customer findCurrentCustomer() {
+        return currentCustomer; // may be null if not set yet
+    }
 
     public void freightDecision(Boolean isFreight) throws DataAccessException {
     }
@@ -142,42 +156,39 @@ public class SaleOrderController {
         String confirm = kr.readString("Confirm order? (y/n): ");
 
         System.out.println("Order cancelled — rolling back stock reservations...");
-        
+
         if (confirm.equalsIgnoreCase("y")) {
-	        // Unreserve products since order goes through
-	        Map<Integer, Integer> productQuantities = new HashMap<>();
-	        for (Product p : productsInOrder) {
-	        	System.out.println("Product in order: " + p.getName());
-	            productQuantities.put(
-	                p.getProductNumber(),
-	                productQuantities.getOrDefault(p.getProductNumber(), 0) + 1 // Quantity of product in order
-	            );
-	        }
-	
-	        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
-	        	System.out.println("Unreserving product");
-	            productController.unreserveProduct(entry.getKey(), entry.getValue());
-	        }
-	        
-	        System.out.println("Order successfully placed!");
+            Map<Integer, Integer> productQuantities = new HashMap<>();
+            for (Product p : productsInOrder) {
+                System.out.println("Product in order: " + p.getName());
+                productQuantities.put(
+                    p.getProductNumber(),
+                    productQuantities.getOrDefault(p.getProductNumber(), 0) + 1
+                );
+            }
+
+            for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
+                System.out.println("Unreserving product");
+                productController.unreserveProduct(entry.getKey(), entry.getValue());
+            }
+
+            System.out.println("Order successfully placed!");
         } else if (confirm.equalsIgnoreCase("n")) {
-        	// Reset Order changes in database
-	        Map<Integer, Integer> productQuantities = new HashMap<>();
-	        for (Product p : productsInOrder) {
-	        	System.out.println("Product in order: " + p.getName());
-	            productQuantities.put(
-	                p.getProductNumber(),
-	                productQuantities.getOrDefault(p.getProductNumber(), 0) + 1 // Quantity of product in order
-	            );
-	        }
-	
-	        for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
-	        	System.out.println("Unreserving product");
-	            productController.resetOrder(currentOrder.getId(), entry.getKey(), entry.getValue());
-	        }
-	        
-	        System.out.println("Order successfully cancelled!");
+            Map<Integer, Integer> productQuantities = new HashMap<>();
+            for (Product p : productsInOrder) {
+                System.out.println("Product in order: " + p.getName());
+                productQuantities.put(
+                    p.getProductNumber(),
+                    productQuantities.getOrDefault(p.getProductNumber(), 0) + 1
+                );
+            }
+
+            for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
+                System.out.println("Unreserving product");
+                productController.resetOrder(currentOrder.getId(), entry.getKey(), entry.getValue());
+            }
+
+            System.out.println("Order successfully cancelled!");
         }
     }
-
 }
