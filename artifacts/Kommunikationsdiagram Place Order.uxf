@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>4</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>384</x>
+      <y>200</y>
+      <w>40</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>_:TUI_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>400</x>
+      <y>208</y>
+      <w>164</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+1: placeOrder()
+2: p = findProductByNumber(productNumber: int, quantity: int)
+3: c = findCustomerByPhone(phoneNumber: int)
+4: freightDecision(isFreight: boolean)
+5: confirmation()
+</panel_attributes>
+    <additional_attributes>10.0;110.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>376</x>
+      <y>252</y>
+      <w>60</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>_:SaleOrderController_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>228</x>
+      <y>260</y>
+      <w>156</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+3.1: c = findCustomerByPhone(phoneNumber: int)</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;40.0;370.0;40.0;370.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>428</x>
+      <y>248</y>
+      <w>164</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+2.1: p = findProductByNumber(productNumber: int, quantity: int)
+</panel_attributes>
+    <additional_attributes>380.0;20.0;20.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>204</x>
+      <y>288</y>
+      <w>56</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>_:CustomerController_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>228</x>
+      <y>296</y>
+      <w>140</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+3.1.1: c = findCustomerByPhone(phoneNumber: int)
+</panel_attributes>
+    <additional_attributes>10.0;70.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>204</x>
+      <y>324</y>
+      <w>56</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>_:CustomerDB_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>228</x>
+      <y>332</y>
+      <w>104</w>
+      <h>52</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+3.1.1.1.1: c = &lt;&lt;create&gt;&gt; (name: String, 
+address: String, zipCode: String, 
+city: String, phoneNumber: String
+type: String)</panel_attributes>
+    <additional_attributes>10.0;110.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>204</x>
+      <y>376</y>
+      <w>56</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>c:Customer</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>240</x>
+      <y>248</y>
+      <w>144</w>
+      <h>16</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+4.1: createFreight()</panel_attributes>
+    <additional_attributes>10.0;20.0;340.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>32</x>
+      <y>248</y>
+      <w>48</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>f:Freight</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>580</x>
+      <y>252</y>
+      <w>48</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>:ProductController</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>260</y>
+      <w>176</w>
+      <h>48</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+2.1.1:  p = findProductByNumber(productNumber: int, quantity: int)
+</panel_attributes>
+    <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>580</x>
+      <y>300</y>
+      <w>48</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>:ProductDB
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>624</x>
+      <y>296</y>
+      <w>108</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+2.1.1.1*: buildObject(rs) </panel_attributes>
+    <additional_attributes>10.0;40.0;100.0;40.0;100.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>284</x>
+      <y>432</y>
+      <w>48</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>oli:OrderLineItem</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>396</x>
+      <y>356</y>
+      <w>44</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>_:SaleOrderDB_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>464</x>
+      <y>488</y>
+      <w>40</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>_:SaleOrder_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>380</x>
+      <y>260</y>
+      <w>64</w>
+      <h>104</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+1.1: updateOrder()
+2.3: reserveStock()
+5.1: confirmSOrder()
+
+
+</panel_attributes>
+    <additional_attributes>140.0;240.0;140.0;190.0;10.0;190.0;10.0;120.0;60.0;60.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>232</x>
+      <y>196</y>
+      <w>52</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>_:DiscountDB_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>280</x>
+      <y>196</y>
+      <w>104</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+3.2: createDiscount()
+
+</panel_attributes>
+    <additional_attributes>10.0;20.0;190.0;20.0;190.0;140.0;240.0;140.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>112</x>
+      <y>320</y>
+      <w>100</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+3.1.1.1*: buildObject(rs) </panel_attributes>
+    <additional_attributes>230.0;40.0;10.0;40.0;10.0;10.0;230.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>308</y>
+      <w>212</w>
+      <h>96</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+
+2.1.1.1.1.1.1:  m = &lt;&lt;create&gt;&gt;(productNumber: int, 
+name: String, minStock: int, format: String, artist: String)
+// til sidst</panel_attributes>
+    <additional_attributes>510.0;220.0;510.0;40.0;10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>784</x>
+      <y>396</y>
+      <w>40</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>m:Music</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>256</x>
+      <y>260</y>
+      <w>128</w>
+      <h>128</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+</panel_attributes>
+    <additional_attributes>10.0;300.0;130.0;300.0;300.0;70.0;300.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>304</x>
+      <y>260</y>
+      <w>132</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+
+2.2: addProductToOLI(quantity: int)
+</panel_attributes>
+    <additional_attributes>10.0;430.0;10.0;320.0;250.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>488</x>
+      <y>412</y>
+      <w>36</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>i:Invoice</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>400</x>
+      <y>260</y>
+      <w>168</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+4.2: i = &lt;&lt;create&gt;&gt;()
+4.3: updateInfo(amount: double, 
+customerType: String, freightCost: double, 
+discountCost: double, vat: double)
+
+
+
+</panel_attributes>
+    <additional_attributes>260.0;380.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>196</x>
+      <y>248</y>
+      <w>48</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>_:FreightDB_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>68</x>
+      <y>196</y>
+      <w>48</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>d:Discount</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>76</x>
+      <y>248</y>
+      <w>128</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+4.1.1: f = &lt;&lt;create&gt;&gt;(method: String,
+baseCost: double, freeThreshold: double)</panel_attributes>
+    <additional_attributes>10.0;20.0;300.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>112</x>
+      <y>192</y>
+      <w>128</w>
+      <h>32</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+3.2.1: d = &lt;&lt;create&gt;&gt;(type: String,
+amount: double, discountThreshold: double)
+
+</panel_attributes>
+    <additional_attributes>10.0;20.0;300.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>480</x>
+      <y>308</y>
+      <w>148</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+2.1.1.1.1: s = &lt;&lt;create&gt;&gt;(availableQty: int, reservedQty: int)
+
+</panel_attributes>
+    <additional_attributes>240.0;260.0;240.0;170.0;160.0;170.0;310.0;40.0;310.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>616</x>
+      <y>380</y>
+      <w>40</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>sp:SalesPrice</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>600</x>
+      <y>308</y>
+      <w>172</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+2.1.1.1.1.1: sp = &lt;&lt;create&gt;&gt;(timeStamp: date, price: double)</panel_attributes>
+    <additional_attributes>90.0;180.0;90.0;150.0;10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>420</x>
+      <y>364</y>
+      <w>172</w>
+      <h>132</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+
+1.1.1.1: so = &lt;&lt;create&gt;&gt;(date: Date, amount: double,
+	deliveryStatus: String, deliveryDate: String)</panel_attributes>
+    <additional_attributes>160.0;310.0;160.0;270.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>332</x>
+      <y>352</y>
+      <w>76</w>
+      <h>24</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+1.1.1*: buildObject(rs) </panel_attributes>
+    <additional_attributes>160.0;40.0;10.0;40.0;10.0;10.0;170.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>316</x>
+      <y>468</y>
+      <w>40</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>externalDB</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>328</x>
+      <y>364</y>
+      <w>132</w>
+      <h>112</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-
+
+
+1.1.1.1: create SaleOrder
+2.3.1: update SaleOrder and Stock
+5.1.1: finalize SaleOrder</panel_attributes>
+    <additional_attributes>10.0;260.0;190.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>552</x>
+      <y>412</y>
+      <w>60</w>
+      <h>12</h>
+    </coordinates>
+    <panel_attributes>s:Stock</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
