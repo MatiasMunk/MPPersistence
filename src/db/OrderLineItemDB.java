@@ -7,25 +7,24 @@ import java.sql.SQLException;
 public class OrderLineItemDB implements OrderLineItemDBIF {
 
     @Override
-    public void addOrIncrement(int saleOrderId, int productNumber, int quantity) throws DataAccessException {
-        String sql = """
-            MERGE OrderLineItem AS tgt
-            USING (SELECT ? AS saleOrderID_FK, ? AS productNumber_FK, ? AS quantity) AS src
-            ON (tgt.saleOrderID_FK = src.saleOrderID_FK AND tgt.productNumber_FK = src.productNumber_FK)
-            WHEN MATCHED THEN
-                UPDATE SET quantity = tgt.quantity + src.quantity
-            WHEN NOT MATCHED THEN
-                INSERT (saleOrderID_FK, productNumber_FK, quantity)
-                VALUES (src.saleOrderID_FK, src.productNumber_FK, src.quantity);
-        """;
-        Connection conn = DBConnection.getInstance().getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, saleOrderId);
+    public void addOrIncrement(int saleOrderID, int productNumber, int quantity) throws DataAccessException {
+        String sql = "MERGE OrderLineItem AS target " +
+                     "USING (SELECT ? AS saleOrderID, ? AS productNo, ? AS qty) AS src " +
+                     "ON (target.saleOrderID_FK = src.saleOrderID AND target.productNumber_FK = src.productNo) " +
+                     "WHEN MATCHED THEN " +
+                     "    UPDATE SET quantity = target.quantity + src.qty " +
+                     "WHEN NOT MATCHED THEN " +
+                     "    INSERT (saleOrderID_FK, productNumber_FK, quantity) " +
+                     "    VALUES (src.saleOrderID, src.productNo, src.qty);";
+
+        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setInt(1, saleOrderID);
             ps.setInt(2, productNumber);
             ps.setInt(3, quantity);
-            if (ps.executeUpdate() == 0) throw new SQLException("OrderLineItem upsert failed");
+            ps.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException(0x3010, e);
+            throw new DataAccessException(0x1012, e);
         }
     }
+
 }

@@ -102,9 +102,10 @@ public class SaleOrderController {
 
             // reserve instantly
             productController.reserveProduct(productNumber, quantity);
+            
 
             // write line item
-            saleOrderDB.addOrderLineItem(currentOrder.getId(), productNumber, quantity);
+            new OrderLineItemDB().addOrIncrement(currentOrder.getId(), productNumber, quantity);
 
             // cache for possible cancel
             for (int i = 0; i < quantity; i++) {
