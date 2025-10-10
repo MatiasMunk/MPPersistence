@@ -1,8 +1,6 @@
 package tui;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import db.DBConnection;
 import db.DataAccessException;
