@@ -82,7 +82,6 @@ public class SaleOrderController {
 
         // reset current customer for the new order
         currentCustomer = null;
-        currentCustomerPhone = null;
 
         return currentOrder;
     }
@@ -140,7 +139,6 @@ public class SaleOrderController {
                 throw new IllegalStateException("No customer found with phone: " + phoneNumber);
             }
             currentCustomer = found;
-            currentCustomerPhone = phoneNumber;
 
             // Update DB with the phone (existing API)
             String phoneStr = String.valueOf(phoneNumber);
