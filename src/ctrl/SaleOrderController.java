@@ -8,11 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import db.DBConnection;
-import db.SaleOrderDBIF;
+import db.*;
 import dk.raptus.KeyboardReader;
-import db.SaleOrderDB;
-import db.DataAccessException;
 
 import model.Product;
 import model.SaleOrder;
@@ -94,23 +91,42 @@ public class SaleOrderController {
         return currentOrder;
     }
 
+    /**
+     * Add product now:
+     * 1) reserve stock (availableQty down, reservedQty up)
+     * 2) insert OrderLineItem
+     * 3) commit immediately so changes are visible right away
+     * 4) start a fresh transaction to keep the flow consistent
+     */
     public void addProduct(int productNumber, int quantity) throws DataAccessException {
         try {
             Product p = productController.findProductByNumber(productNumber);
             if (p == null) {
-                throw new SQLException();
+                throw new SQLException("No product found for number " + productNumber);
             }
 
+            // reserve instantly
             productController.reserveProduct(productNumber, quantity);
+
+            // write line item
+            saleOrderDB.addOrderLineItem(currentOrder.getId(), productNumber, quantity);
+
+            // cache for possible cancel
             for (int i = 0; i < quantity; i++) {
-                System.out.println("Product: " + productNumber + " added to order");
                 productsInOrder.add(p);
             }
 
-            saleOrderDB.addOrderLineItem(currentOrder.getId(), productNumber, quantity);
+            // commit now if we are inside a transaction, then restart it
+            try {
+                if (!DBConnection.getInstance().getConnection().getAutoCommit()) {
+                    DBConnection.getInstance().commitTransaction();
+                    DBConnection.getInstance().startTransaction();
+                }
+            } catch (SQLException ignore) {
+                // if autocommit is true this is a no-op
+            }
 
-            System.out.println(quantity + " × " + p.getName() + " added to order.");
-
+            System.out.println(quantity + " × " + p.getName() + " added to order (reserved).");
         } catch (SQLException e) {
             throw new DataAccessException(0x1008, e);
         }
@@ -152,43 +168,136 @@ public class SaleOrderController {
     public void addDiscount(String type) throws DataAccessException {
     }
 
-    public void confirmation() throws DataAccessException {
-        String confirm = kr.readString("Confirm order? (y/n): ");
 
-        System.out.println("Order cancelled — rolling back stock reservations...");
+    public void confirmation(String confirm) throws DataAccessException {
+
+
+        Map<Integer, Integer> productQuantities = new HashMap<>();
+        for (Product p : productsInOrder) {
+            productQuantities.put(
+                p.getProductNumber(),
+                productQuantities.getOrDefault(p.getProductNumber(), 0) + 1
+            );
+        }
 
         if (confirm.equalsIgnoreCase("y")) {
-            Map<Integer, Integer> productQuantities = new HashMap<>();
-            for (Product p : productsInOrder) {
-                System.out.println("Product in order: " + p.getName());
-                productQuantities.put(
-                    p.getProductNumber(),
-                    productQuantities.getOrDefault(p.getProductNumber(), 0) + 1
-                );
-            }
-
+            // consume reservations
             for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
-                System.out.println("Unreserving product");
-                productController.unreserveProduct(entry.getKey(), entry.getValue());
+                productController.consumeReservation(entry.getKey(), entry.getValue());
             }
 
-            System.out.println("Order successfully placed!");
-        } else if (confirm.equalsIgnoreCase("n")) {
-            Map<Integer, Integer> productQuantities = new HashMap<>();
-            for (Product p : productsInOrder) {
-                System.out.println("Product in order: " + p.getName());
-                productQuantities.put(
-                    p.getProductNumber(),
-                    productQuantities.getOrDefault(p.getProductNumber(), 0) + 1
-                );
-            }
-
+            // calculate totals and create invoice
+            double amountBeforeDiscount = 0.0;
             for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
-                System.out.println("Unreserving product");
+                double price = productController.getCurrentPrice(entry.getKey());
+                amountBeforeDiscount += price * entry.getValue();
+            }
+
+            double discountValue = 0.0;
+            if ("klub".equalsIgnoreCase(currentCustomer.getType()) && amountBeforeDiscount > 1500.0) {
+                discountValue = 100.0;
+                new DiscountDB().upsertForOrder(currentOrder.getId(), "club", discountValue);
+            } else {
+                new DiscountDB().upsertForOrder(currentOrder.getId(), "none", 0.0);
+            }
+
+            double freightValue = 0.0;
+            if ("privat".equalsIgnoreCase(currentCustomer.getType())) {
+                freightValue = amountBeforeDiscount > 2500 ? 0.0 : 45.0;
+                new FreightDB().upsertForOrder(currentOrder.getId(), "standard", 45.0, 2500.0);
+            } else {
+                new FreightDB().upsertForOrder(currentOrder.getId(), "none", 0.0, null);
+            }
+
+            double net = Math.max(0, amountBeforeDiscount - discountValue) + freightValue;
+            double vat = Math.round(net * 0.25 * 100.0) / 100.0;
+            double total = net + vat;
+
+            new InvoiceDB().createInvoice(currentOrder.getId(), java.time.LocalDate.now(), net, vat, total);
+
+            System.out.println("Order confirmed with invoice #" + currentOrder.getId());
+        }
+        else if (confirm.equalsIgnoreCase("n")) {
+            // Cancel: release reservations and delete line items
+            for (Map.Entry<Integer, Integer> entry : productQuantities.entrySet()) {
                 productController.resetOrder(currentOrder.getId(), entry.getKey(), entry.getValue());
             }
+            System.out.println("Order cancelled and reservations released.");
+        } else {
+            System.out.println("Unknown choice. Leaving order unchanged.");
+        }
+    }
 
-            System.out.println("Order successfully cancelled!");
+
+    public int confirmOrder(
+            model.Customer customer,
+            java.util.Map<Integer, Integer> itemsByProductNo
+    ) throws DataAccessException {
+
+        if (itemsByProductNo == null || itemsByProductNo.isEmpty())
+            throw new IllegalArgumentException("Order must contain at least one item");
+
+        CustomerDBIF customerDB = new CustomerDB();
+        customerDB.upsert(customer);
+
+        try {
+            DBConnection.getInstance().startTransaction();
+
+            SaleOrderDBIF orderDB = new SaleOrderDB();
+            int orderId = orderDB.createOrder(
+                    customer.getPhoneNo(),
+                    java.time.LocalDate.now(),
+                    0.0,
+                    "confirmed",
+                    java.time.LocalDate.now()
+            );
+
+            ProductController productCtrl = new ProductController();
+            OrderLineItemDBIF oliDB = new OrderLineItemDB();
+
+            double amountBeforeDiscount = 0.0;
+            for (java.util.Map.Entry<Integer, Integer> e : itemsByProductNo.entrySet()) {
+                int productNo = e.getKey();
+                int qty = e.getValue();
+                if (qty <= 0) continue;
+
+                productCtrl.reserveProduct(productNo, qty);
+                oliDB.addOrIncrement(orderId, productNo, qty);
+
+                Double price = productCtrl.getCurrentPrice(productNo);
+                amountBeforeDiscount += price * qty;
+            }
+
+            double discountValue = 0.0;
+            if ("klub".equalsIgnoreCase(customer.getType()) && amountBeforeDiscount > 1500.0) {
+                discountValue = 100.0;
+                new DiscountDB().upsertForOrder(orderId, "club", discountValue);
+            } else {
+                new DiscountDB().upsertForOrder(orderId, "none", 0.0);
+            }
+
+            double freightBase = 0.0, freightThreshold = 0.0, freightValue = 0.0;
+            if ("privat".equalsIgnoreCase(customer.getType())) {
+                freightBase = 45.0;
+                freightThreshold = 2500.0;
+                freightValue = amountBeforeDiscount > freightThreshold ? 0.0 : freightBase;
+                new FreightDB().upsertForOrder(orderId, "standard", freightBase, freightThreshold);
+            } else {
+                new FreightDB().upsertForOrder(orderId, "none", 0.0, null);
+            }
+
+            double net = Math.max(0.0, amountBeforeDiscount - discountValue) + freightValue;
+            double vat = Math.round(net * 0.25 * 100.0) / 100.0;
+            double total = net + vat;
+
+            new InvoiceDB().createInvoice(orderId, java.time.LocalDate.now(), net, vat, total);
+
+            DBConnection.getInstance().commitTransaction();
+            return orderId;
+        } catch (Exception ex) {
+            try { DBConnection.getInstance().rollbackTransaction(); } catch (Exception ignore) {}
+            if (ex instanceof DataAccessException) throw (DataAccessException) ex;
+            throw new DataAccessException(0x3999, ex);
         }
     }
 }

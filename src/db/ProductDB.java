@@ -140,7 +140,7 @@ public class ProductDB implements ProductDBIF {
                 PreparedStatement psDelete = conn.prepareStatement(deleteLineItemSQL);
             	PreparedStatement psDeleteOrder = conn.prepareStatement(deleteSaleOrderSQL);
             ) {
-                // 1️⃣ Reset reservedQty in Stock
+                // 1️ Reset reservedQty in Stock
             	psReset.setInt(1, quantity);
             	psReset.setInt(2, quantity);
                 psReset.setInt(3, productNumber);
@@ -149,7 +149,7 @@ public class ProductDB implements ProductDBIF {
                     throw new SQLException("No stock updated for product " + productNumber);
                 }
 
-             // 2️⃣ Delete the order line item
+             // 2️ Delete the order line item
                 psDelete.setInt(1, saleOrderId);
                 psDelete.setInt(2, productNumber);
                 int affectedLine = psDelete.executeUpdate();
@@ -195,4 +195,18 @@ public class ProductDB implements ProductDBIF {
 		}
 		return products;
 	}
+	@Override
+	public void consumeReservation(int productNumber, int quantity) throws DataAccessException {
+	    String sql = "UPDATE Stock SET reservedQty = reservedQty - ?" +
+	                 "WHERE productNumber_FK = ?";
+	    try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+	        ps.setInt(1, quantity);
+	        ps.setInt(2, productNumber);
+	        ps.executeUpdate();
+	    } catch (SQLException e) {
+	        throw new DataAccessException(0x2005, e);
+	    }
+	}
+
+
 }

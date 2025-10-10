@@ -1,144 +1,122 @@
 package tui;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import db.DataAccessException;
 import db.DBConnection;
-import dk.raptus.KeyboardReader; // Provided by KeyboardReader.jar (in /lib)
+import db.DataAccessException;
+import dk.raptus.KeyboardReader;
 import ctrl.CustomerController;
 import ctrl.ProductController;
 import ctrl.SaleOrderController;
 import model.Customer;
 import model.Product;
-import model.SaleOrder;
 
 public class Scenario {
-	private KeyboardReader kr;
-	private SaleOrderController saleOrderController;
-	private CustomerController customerController;
-	private ProductController productController;
-	
-	public Scenario() {
-		kr = KeyboardReader.getInstance();
-		saleOrderController = new SaleOrderController();
-		customerController = new CustomerController();
-		productController = new ProductController();
-	}
-	
-	private void placeOrder() {
-	    try {
-	        System.out.println("\n=== PLACE NEW ORDER ===");
-	        
-	        // Start transaction
-	        saleOrderController.startTransaction();
-	        
-	        // Step 1: Create the order
-	        SaleOrder order = saleOrderController.placeOrder();
-	        
-	        boolean addingProducts = true;
-	        while (addingProducts) {
-	            int productNumber = kr.readInt("Enter product number: ", "You must type in an integer: ");
-	            int quantity = kr.readInt("Enter quantity: ", "You must type in an integer: ");
-	            saleOrderController.addProduct(productNumber, quantity); // 2.1
-	            
-	            String more = kr.readString("Add more products? (y/n): ");
-	            addingProducts = more.equalsIgnoreCase("y");
-	        }
+    private final KeyboardReader kr;
+    private final SaleOrderController saleOrderController = new SaleOrderController();
+    private final CustomerController customerController = new CustomerController();
+    private final ProductController productController = new ProductController();
 
-	        // Step 2: Add customer
-	        int phoneNumber = kr.readInt("Enter customer phone number: ", "You must type in an integer: ");
-	        saleOrderController.addCustomer(phoneNumber);
+    public Scenario() {
+        kr = KeyboardReader.getInstance();
+    }
 
-	        // Step 3: Freight
-	        int method = kr.readInt("Enter freight method (0 = no freight/1 = freight): ", "You must type in an integer: ");
-	        saleOrderController.freightDecision(method == 0 ? false : true);
+    public void run() {
+        boolean running = true;
+        while (running) {
+            int choice = showMenu();
+            switch (choice) {
+                case 1:
+                    placeNewOrder();
+                    break;
+                case 2:
+                    findAllCustomers();
+                    break;
+                case 3:
+                    findAllProducts();
+                    break;
+                case 0:
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Unknown choice");
+            }
+        }
+        DBConnection.getInstance().close();
+        kr.close();
+    }
 
-	        // Step 4: Confirmation
-	        saleOrderController.confirmation();
-	        
-	        // Commit transaction
-	        saleOrderController.endTransaction();
+    private int showMenu() {
+        System.out.println("SALES HANDLING");
+        System.out.println(" 1) Place order");
+        System.out.println(" 2) Find all customers");
+        System.out.println(" 3) Find all products");
+        System.out.println(" 0) Quit program!");
+        return kr.readInt("Make a choice: ", "You must type in an integer: ");
+    }
 
-	    } catch (DataAccessException e) {
-	        System.out.println("Database error: " + e.getMessage());
-	        try {
-	            saleOrderController.rollbackTransaction();
-	        } catch (DataAccessException rollbackEx) {
-	            System.out.println("Rollback failed: " + rollbackEx.getMessage());
-	        }
-	    } catch (Exception e) {
-	        System.out.println("Error placing order: " + e.getMessage());
-	        try {
-	            saleOrderController.rollbackTransaction();
-	        } catch (DataAccessException rollbackEx) {
-	            System.out.println("Rollback failed: " + rollbackEx.getMessage());
-	        }
-	    }
-	}
+    private void placeNewOrder() {
+        System.out.println("=== PLACE NEW ORDER ===");
 
-	private void findAllCustomers() {
-	    try {
-	        // Get all customers from the controller
-	        List<Customer> customers = customerController.findAllCustomers();
+        int phone = kr.readInt("Enter customer phone: ", "You must type in an integer: ");
+        Customer cust = null;
+        try {
+            cust = customerController.findCustomerByPhone(phone);
+        } catch (DataAccessException e) {
+            System.out.println("Error fetching customer: " + e.getMessage());
+        }
 
-	        System.out.println("\n=== ALL CUSTOMERS ===");
-	        for (Customer c : customers) {
-	        	System.out.println(c);
-	        }
-	    } catch (DataAccessException e) {
-	        System.out.println("Error fetching customers: " + e.getMessage());
-	    }
-	}
+        if (cust == null) {
+            System.out.println("No customer found with phone: " + phone);
+            return;
+        }
 
-	private void findAllProducts() {
-	    try {
-	        // Get all products from the controller
-	        List<Product> products = productController.findAllProducts();
+        try {
+            saleOrderController.placeOrder();               // create new order
+            saleOrderController.addCustomer(phone);         // link customer
 
-	        System.out.println("\n=== ALL PRODUCTS ===");
-	        for (Product p : products) {
-	        	System.out.println(p);
-	        }
-	    } catch (DataAccessException e) {
-	        System.out.println("Error fetching products: " + e.getMessage());
-	    }
-	}
+            while (true) {
+                int pNo = kr.readInt("Enter product number (0 to finish): ",
+                                     "You must type in an integer: ");
+                if (pNo == 0) break;
+                int qty = kr.readInt("Quantity: ", "You must type in an integer: ");
 
-	
-	private int showMenu() {
-		System.out.println("\nSALES HANDLING");
-		System.out.println(" 1) Place order");
-		System.out.println(" 2) Find all customers");
-		System.out.println(" 3) Find all products");
-		System.out.println(" 0) Quit program!");
-		return kr.readInt("Make a choice: ", "You must type in an integer: ");
-	}
+                saleOrderController.addProduct(pNo, qty);   // reserves immediately
+            }
 
-	private void run() {
-		int choice = -1;
-		while (choice != 0) {
-			choice = showMenu();
-			switch (choice) {
-				case 0:
-					break;
-				case 1:
-					placeOrder();
-					break;
-				case 2:
-					findAllCustomers();
-					break;
-				case 3:
-					findAllProducts();
-					break;
-				default:
-					System.out.println("Wrong choice - let's try again!");
-			}
-		}
-		DBConnection.getInstance().close();
-		kr.close();
-	}
+            String confirm = kr.readString("Confirm order? (y/n): ");
+            saleOrderController.confirmation(confirm);
 
-	public static void main(String args[]) {
-		new Scenario().run();
-	}
+        } catch (DataAccessException e) {
+            System.out.println("Error placing order: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+
+    private void findAllCustomers() {
+        System.out.println("=== ALL CUSTOMERS ===");
+        try {
+            List<Customer> customers = customerController.findAllCustomers();
+            customers.forEach(System.out::println);
+        } catch (DataAccessException e) {
+            System.out.println("Error fetching customers: " + e.getMessage());
+        }
+    }
+
+    private void findAllProducts() {
+        System.out.println("=== ALL PRODUCTS ===");
+        try {
+            List<Product> products = productController.findAllProducts();
+            products.forEach(System.out::println);
+        } catch (DataAccessException e) {
+            System.out.println("Error fetching products: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        new Scenario().run();
+    }
 }

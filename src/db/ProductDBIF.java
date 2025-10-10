@@ -10,4 +10,5 @@ public interface ProductDBIF {
 	public void reserveProduct(int productNumber, int quantity) throws DataAccessException;
 	public void unreserveProduct(int productNumber, int quantity) throws DataAccessException;
 	public void resetOrder(int saleOrderId, int productNumber, int quantity) throws DataAccessException;
+	public void consumeReservation(int productNumber, int quantity) throws DataAccessException;
 }

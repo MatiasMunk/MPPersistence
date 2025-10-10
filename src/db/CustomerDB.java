@@ -76,4 +76,34 @@ public class CustomerDB implements CustomerDBIF {
 		}
 		return customers;
 	}
+
+
+    @Override
+    public void upsert(model.Customer c) throws DataAccessException {
+        String sql = """
+            MERGE Customer AS tgt
+            USING (SELECT ? AS phoneNo) AS src
+            ON (tgt.phoneNo = src.phoneNo)
+            WHEN MATCHED THEN UPDATE SET
+                name = ?, address = ?, zipCity_FK = ?, type = ?
+            WHEN NOT MATCHED THEN
+                INSERT (phoneNo, name, address, zipCity_FK, type)
+                VALUES (?, ?, ?, ?, ?);
+        """;
+        try (PreparedStatement ps = DBConnection.getInstance().getConnection().prepareStatement(sql)) {
+            ps.setString(1, c.getPhoneNo());
+            ps.setString(2, c.getName());
+            ps.setString(3, c.getAddress());
+            ps.setString(4, c.getCity());
+            ps.setString(5, c.getType());
+            ps.setString(6, c.getPhoneNo());
+            ps.setString(7, c.getName());
+            ps.setString(8, c.getAddress());
+            ps.setString(9, c.getCity());
+            ps.setString(10, c.getType());
+            if (ps.executeUpdate() == 0) throw new SQLException("Customer upsert failed");
+        } catch (SQLException e) {
+            throw new DataAccessException(0x2050, e);
+        }
+    }
 }
