@@ -16,11 +16,9 @@ import model.SaleOrder;
 import model.Customer;
 
 public class SaleOrderController {
-    private KeyboardReader kr;
 
     private SaleOrder currentOrder;
     private Customer currentCustomer;           
-    private Integer currentCustomerPhone;       
 
     private final ProductController productController;
     private final CustomerController customerController;
@@ -30,8 +28,6 @@ public class SaleOrderController {
     private final List<Product> productsInOrder;
 
     public SaleOrderController() {
-        kr = KeyboardReader.getInstance();
-
         productController = new ProductController();
         customerController = new CustomerController();
 
@@ -225,79 +221,6 @@ public class SaleOrderController {
             System.out.println("Order cancelled and reservations released.");
         } else {
             System.out.println("Unknown choice. Leaving order unchanged.");
-        }
-    }
-
-
-    public int confirmOrder(
-            model.Customer customer,
-            java.util.Map<Integer, Integer> itemsByProductNo
-    ) throws DataAccessException {
-
-        if (itemsByProductNo == null || itemsByProductNo.isEmpty())
-            throw new IllegalArgumentException("Order must contain at least one item");
-
-        CustomerDBIF customerDB = new CustomerDB();
-        customerDB.upsert(customer);
-
-        try {
-            DBConnection.getInstance().startTransaction();
-
-            SaleOrderDBIF orderDB = new SaleOrderDB();
-            int orderId = orderDB.createOrder(
-                    customer.getPhoneNo(),
-                    java.time.LocalDate.now(),
-                    0.0,
-                    "confirmed",
-                    java.time.LocalDate.now()
-            );
-
-            ProductController productCtrl = new ProductController();
-            OrderLineItemDBIF oliDB = new OrderLineItemDB();
-
-            double amountBeforeDiscount = 0.0;
-            for (java.util.Map.Entry<Integer, Integer> e : itemsByProductNo.entrySet()) {
-                int productNo = e.getKey();
-                int qty = e.getValue();
-                if (qty <= 0) continue;
-
-                productCtrl.reserveProduct(productNo, qty);
-                oliDB.addOrIncrement(orderId, productNo, qty);
-
-                Double price = productCtrl.getCurrentPrice(productNo);
-                amountBeforeDiscount += price * qty;
-            }
-
-            double discountValue = 0.0;
-            if ("klub".equalsIgnoreCase(customer.getType()) && amountBeforeDiscount > 1500.0) {
-                discountValue = 100.0;
-                new DiscountDB().upsertForOrder(orderId, "club", discountValue);
-            } else {
-                new DiscountDB().upsertForOrder(orderId, "none", 0.0);
-            }
-
-            double freightBase = 0.0, freightThreshold = 0.0, freightValue = 0.0;
-            if ("privat".equalsIgnoreCase(customer.getType())) {
-                freightBase = 45.0;
-                freightThreshold = 2500.0;
-                freightValue = amountBeforeDiscount > freightThreshold ? 0.0 : freightBase;
-                new FreightDB().upsertForOrder(orderId, "standard", freightBase, freightThreshold);
-            } else {
-                new FreightDB().upsertForOrder(orderId, "none", 0.0, null);
-            }
-
-            double net = Math.max(0.0, amountBeforeDiscount - discountValue) + freightValue;
-            double vat = Math.round(net * 0.25 * 100.0) / 100.0;
-            double total = net + vat;
-
-            new InvoiceDB().createInvoice(orderId, java.time.LocalDate.now(), net, vat, total);
-
-            DBConnection.getInstance().commitTransaction();
-            return orderId;
-        } catch (Exception ex) {
-            try { DBConnection.getInstance().rollbackTransaction(); } catch (Exception ignore) {}
-            if (ex instanceof DataAccessException) throw (DataAccessException) ex;
-            throw new DataAccessException(0x3999, ex);
         }
     }
 }
