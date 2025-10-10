@@ -44,13 +44,15 @@ public class Scenario {
         }
         DBConnection.getInstance().close();
         kr.close();
+        System.out.println("Program terminated.");
+        System.exit(0);
     }
 
     private int showMenu() {
         System.out.println("SALES HANDLING");
         System.out.println(" 1) Place order");
-        System.out.println(" 2) Find all customers");
-        System.out.println(" 3) Find all products");
+        System.out.println(" 2) Find all customers (not used in scenario)");
+        System.out.println(" 3) Find all products (not used in scenario)");
         System.out.println(" 0) Quit program!");
         return kr.readInt("Make a choice: ", "You must type in an integer: ");
     }
