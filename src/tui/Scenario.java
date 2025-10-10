@@ -27,7 +27,7 @@ public class Scenario {
             int choice = showMenu();
             switch (choice) {
                 case 1:
-                    placeNewOrder();
+                    placeOrder();
                     break;
                 case 2:
                     findAllCustomers();
@@ -57,7 +57,7 @@ public class Scenario {
         return kr.readInt("Make a choice: ", "You must type in an integer: ");
     }
 
-    private void placeNewOrder() {
+    private void placeOrder() {
         System.out.println("=== PLACE NEW ORDER ===");
 
         int phone = kr.readInt("Enter customer phone: ", "You must type in an integer: ");
